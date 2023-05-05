@@ -1,4 +1,4 @@
-**Note: This is work in progress to transfer the SD-JWT implementation from ttps://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/ into this repository. Until this is done, please refer to the original repository.**
+**Note: This is work in progress to transfer the SD-JWT implementation from https://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/ into this repository. Until this is done, please refer to the original repository.**
 
 # SD-JWT Reference Implementation
 
