@@ -6,3 +6,31 @@ This is a reference implementation of the [IETF SD-JWT specification](https://da
 
 This implementation is used to generate the examples in the specification, but can also be used as a library in other projects.
 
+## generate.py
+
+The script `generate.py` can be used for generating test cases (for consumption by other SD-JWT implementations) and for generating the examples in the SD-JWT specification and other documents.
+
+For both use cases, the script expects a JSON file with settings (`test_settings.yml` or `example_settings.yml`). Examples for these files can be found in the `test_cases` and `examples` directories, respectively.
+
+Furthermore, the script expects, in its working directory, one subdirectory for each test case or example. In each such directory, there must be a file `test_case.yml` or `example.yml` (depending on the use case) with the test case or example settings. Examples for these files can be found in the subdirectories of the `test_cases` and `examples` directories, respectively.
+
+The script outputs the following files in each test case or example directory:
+
+`combined_issuance.txt`: The issuance format of the SD-JWT.
+
+`combined_presentation.txt`: The presentation format of the SD-JWT.
+
+`disclosures.md`: The disclosures, formatted as markdown (only in 'example' mode).
+
+`user_claims.json`: The user claims.
+
+`sd_jwt_payload.json`: The payload of the SD-JWT.
+
+`sd_jwt_serialized.txt`: The serialized SD-JWT.
+
+`hb_jwt_payload.json`: The payload of the holder binding JWT.
+
+`hb_jwt_serialized.txt`: The serialized holder binding JWT.
+
+`verified_contents.json`: The verified contents of the SD-JWT.
+
