@@ -200,19 +200,28 @@ if __name__ == "__main__":
         help="Whether to generate test cases or examples.",
     )
 
+    # Optional: One or more names of directories containing test cases to generate
+    parser.add_argument(
+        "directories",
+        nargs="*",
+        help=(
+            "One or more names of directories containing test cases to generate. "
+            "If no directories are specified, all directories containing a file "
+            "named 'specification.yml' respectively are processed."
+        ),
+    )
     args = parser.parse_args()
 
     basedir = Path.cwd()
-
-    if args.type == "testcase":
-        settings_file = basedir / "test_settings.yml"
-        glob = basedir.glob("*/testcase.yml")
-    else:
-        settings_file = basedir / "example_settings.yml"
-        glob = basedir.glob("*/example.yml")
+    settings_file = basedir / "settings.yml"
 
     if not settings_file.exists():
         sys.exit(f"Settings file '{settings_file}' does not exist.")
+
+    if args.directories:
+        glob = [basedir / d / "specification.yml" for d in args.directories]
+    else:
+        glob = basedir.glob("*/specification.yml")
 
     # load keys and other information from test_settings.yml
     settings = load_yaml_settings(settings_file)

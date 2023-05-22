@@ -10,9 +10,9 @@ This implementation is used to generate the examples in the specification, but c
 
 The script `generate.py` can be used for generating test cases (for consumption by other SD-JWT implementations) and for generating the examples in the SD-JWT specification and other documents.
 
-For both use cases, the script expects a JSON file with settings (`test_settings.yml` or `example_settings.yml`). Examples for these files can be found in the `test_cases` and `examples` directories, respectively.
+For both use cases, the script expects a JSON file with settings (`settings.yml`). Examples for these files can be found in the `test_cases` and `examples` directories.
 
-Furthermore, the script expects, in its working directory, one subdirectory for each test case or example. In each such directory, there must be a file `test_case.yml` or `example.yml` (depending on the use case) with the test case or example settings. Examples for these files can be found in the subdirectories of the `test_cases` and `examples` directories, respectively.
+Furthermore, the script expects, in its working directory, one subdirectory for each test case or example. In each such directory, there must be a file `specification.yml` with the test case or example specifications. Examples for these files can be found in the subdirectories of the `test_cases` and `examples` directories, respectively.
 
 The script outputs the following files in each test case or example directory:
 

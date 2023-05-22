@@ -160,12 +160,11 @@ cython_debug/
 #.idea/
 
 
-# Ignore output of test cases except for testcase.yml
+# Ignore output of test cases except for specification.yml
 
 test_cases/*/*
-!test_cases/*/testcase.yml
+!test_cases/*/specification.yml
 
-# Ignore output of examples except for examples.yml
-
+# Ignore output of examples except for specification.yml
 examples/*/*
-!examples/*/example.yml
+!examples/*/specification.yml
