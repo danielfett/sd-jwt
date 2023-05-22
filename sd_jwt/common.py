@@ -44,10 +44,12 @@ class SDJWTCommon:
     def _split(self, combined):
         return combined.split(self.COMBINED_FORMAT_SEPARATOR)
 
-    def _base64url_encode(self, data: bytes) -> str:
+    @staticmethod
+    def _base64url_encode(data: bytes) -> str:
         return urlsafe_b64encode(data).decode("ascii").strip("=")
 
-    def _base64url_decode(self, b64data: str) -> bytes:
+    @staticmethod
+    def _base64url_decode(b64data: str) -> bytes:
         padded = f"{b64data}{'=' * divmod(len(b64data),4)[1]}"
         return urlsafe_b64decode(padded)
 

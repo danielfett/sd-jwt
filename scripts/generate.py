@@ -6,7 +6,7 @@ library that affect the test cases.
 """
 
 
-import json
+import argparse
 import logging
 import sys
 from pathlib import Path
@@ -17,21 +17,15 @@ from sd_jwt.issuer import SDJWTIssuer
 from sd_jwt.utils.demo_utils import get_jwk, load_yaml_example, load_yaml_settings
 from sd_jwt.verifier import SDJWTVerifier
 
-OUTPUT_INDENT = 4
-OUTPUT_ENSURE_ASCII = False
-BASEDIR = Path(__file__).parent
-SETTINGS_FILE = BASEDIR / "test_settings.yml"
+from sd_jwt.utils import formatting
 
 logger = logging.getLogger("sd_jwt")
 
 # Set logging to stdout
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-# load keys and other information from test_settings.yml
-settings = load_yaml_settings(SETTINGS_FILE)
 
-
-def generate_test_case_data(testcase_path: Path):
+def generate_test_case_data(testcase_path: Path, type: str):
     seed = settings["random_seed"]
     demo_keys = get_jwk(settings["key_settings"], True, seed)
 
@@ -136,13 +130,31 @@ def generate_test_case_data(testcase_path: Path):
         ),
     }
 
+    # When type is example, add info about disclosures
+    if type == "example":
+        _artifacts["disclosures"] = (
+            formatting.markdown_disclosures(
+                sdjwt_at_holder._hash_to_decoded_disclosure,
+                sdjwt_at_holder._hash_to_disclosure,
+            ),
+            "Payloads of the II-Disclosures",
+            "md",
+        )
+
     # When decoys were used, list those as well (here as a json array)
     if use_decoys:
-        _artifacts["decoy_digests"] = (
-            sdjwt_at_issuer.decoy_digests,
-            "Decoy Claims",
-            "json",
-        )
+        if type == "example":
+            _artifacts["decoy_digests"] = (
+                formatting.markdown_decoy_digests(sdjwt_at_issuer.decoy_digests),
+                "Decoy Claims",
+                "md",
+            )
+        else:
+            _artifacts["decoy_digests"] = (
+                sdjwt_at_issuer.decoy_digests,
+                "Decoy Claims",
+                "json",
+            )
 
     output_dir = testcase_path.parent
 
@@ -151,23 +163,60 @@ def generate_test_case_data(testcase_path: Path):
     if not output_dir.exists():
         sys.exit(f"Output directory '{output_dir}' does not exist.")
 
-    for key, (data, _, ftype) in _artifacts.items():
-        if data is None:
+    formatter = (
+        formatting.format_for_example
+        if type == "example"
+        else formatting.format_for_testcase
+    )
+
+    for key, data_item in _artifacts.items():
+        if data_item is None:
             continue
 
-        if ftype == "json":
-            out = json.dumps(
-                data, indent=OUTPUT_INDENT, ensure_ascii=OUTPUT_ENSURE_ASCII
-            )
-        else:
-            out = data
+        data, _, ftype = data_item
 
         with open(output_dir / f"{key}.{ftype}", "w") as f:
-            f.write(out)
+            f.write(formatter(data, ftype))
 
 
-# For all *.yml files in test_cases, run the test case generation
+# For all *.yml files in subdirectories of the working directory, run the test case generation
 if __name__ == "__main__":
-    for testcase_path in BASEDIR.glob("*/*.yml"):
-        logger.info(f"Generating test case data for '{testcase_path}'")
-        generate_test_case_data(testcase_path)
+    # This tool must be called with either "testcase" or "example" as the first argument in order
+    # to specify which type of output to generate.
+
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate test cases or examples for SD-JWT library. "
+            "Test case data is suitable for use in other SD-JWT libraries. "
+            "Examples are formatted in a markdown-friendly way (e.g., line breaks, "
+            "markdown formatting) for direct inclusion into the specification text."
+        )
+    )
+
+    # Type is a positional argument, either testcase or example
+    parser.add_argument(
+        "type",
+        choices=["testcase", "example"],
+        help="Whether to generate test cases or examples.",
+    )
+
+    args = parser.parse_args()
+
+    basedir = Path.cwd()
+
+    if args.type == "testcase":
+        settings_file = basedir / "test_settings.yml"
+        glob = basedir.glob("*/testcase.yml")
+    else:
+        settings_file = basedir / "example_settings.yml"
+        glob = basedir.glob("*/example.yml")
+
+    if not settings_file.exists():
+        sys.exit(f"Settings file '{settings_file}' does not exist.")
+
+    # load keys and other information from test_settings.yml
+    settings = load_yaml_settings(settings_file)
+
+    for case_path in glob:
+        logger.info(f"Generating data for '{case_path}'")
+        generate_test_case_data(case_path, args.type)
