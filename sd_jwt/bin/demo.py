@@ -18,7 +18,7 @@ from sd_jwt.holder import SDJWTHolder
 from sd_jwt.issuer import SDJWTIssuer
 from sd_jwt.verifier import SDJWTVerifier
 
-from sd_jwt.utils.replace_utils import (
+from sd_jwt.utils.formatting import (
     textwrap_json,
     textwrap_text,
     multiline_code,

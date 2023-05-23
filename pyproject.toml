@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sd-jwt"
-version = "0.9.0"
+version = "0.9.1"
 description = "The reference implementation of the IETF SD-JWT specification."
 authors = ["Daniel Fett <mail@danielfett.de>"]
 readme = "README.md"
@@ -20,4 +20,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-sd-jwt = "sd_jwt.bin.sd_jwt:main"
+sd-jwt-demo = "sd_jwt.bin.demo:main"
+sd-jwt-generate = "sd_jwt.bin.generate:main"

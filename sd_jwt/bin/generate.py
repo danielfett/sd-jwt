@@ -180,52 +180,52 @@ def generate_test_case_data(testcase_path: Path, type: str):
 
 
 # For all *.yml files in subdirectories of the working directory, run the test case generation
-if __name__ == "__main__":
-    # This tool must be called with either "testcase" or "example" as the first argument in order
-    # to specify which type of output to generate.
 
-    parser = argparse.ArgumentParser(
-        description=(
-            "Generate test cases or examples for SD-JWT library. "
-            "Test case data is suitable for use in other SD-JWT libraries. "
-            "Examples are formatted in a markdown-friendly way (e.g., line breaks, "
-            "markdown formatting) for direct inclusion into the specification text."
-        )
+# This tool must be called with either "testcase" or "example" as the first argument in order
+# to specify which type of output to generate.
+
+parser = argparse.ArgumentParser(
+    description=(
+        "Generate test cases or examples for SD-JWT library. "
+        "Test case data is suitable for use in other SD-JWT libraries. "
+        "Examples are formatted in a markdown-friendly way (e.g., line breaks, "
+        "markdown formatting) for direct inclusion into the specification text."
     )
+)
 
-    # Type is a positional argument, either testcase or example
-    parser.add_argument(
-        "type",
-        choices=["testcase", "example"],
-        help="Whether to generate test cases or examples.",
-    )
+# Type is a positional argument, either testcase or example
+parser.add_argument(
+    "type",
+    choices=["testcase", "example"],
+    help="Whether to generate test cases or examples.",
+)
 
-    # Optional: One or more names of directories containing test cases to generate
-    parser.add_argument(
-        "directories",
-        nargs="*",
-        help=(
-            "One or more names of directories containing test cases to generate. "
-            "If no directories are specified, all directories containing a file "
-            "named 'specification.yml' respectively are processed."
-        ),
-    )
-    args = parser.parse_args()
+# Optional: One or more names of directories containing test cases to generate
+parser.add_argument(
+    "directories",
+    nargs="*",
+    help=(
+        "One or more names of directories containing test cases to generate. "
+        "If no directories are specified, all directories containing a file "
+        "named 'specification.yml' respectively are processed."
+    ),
+)
+args = parser.parse_args()
 
-    basedir = Path.cwd()
-    settings_file = basedir / "settings.yml"
+basedir = Path.cwd()
+settings_file = basedir / "settings.yml"
 
-    if not settings_file.exists():
-        sys.exit(f"Settings file '{settings_file}' does not exist.")
+if not settings_file.exists():
+    sys.exit(f"Settings file '{settings_file}' does not exist.")
 
-    if args.directories:
-        glob = [basedir / d / "specification.yml" for d in args.directories]
-    else:
-        glob = basedir.glob("*/specification.yml")
+if args.directories:
+    glob = [basedir / d / "specification.yml" for d in args.directories]
+else:
+    glob = basedir.glob("*/specification.yml")
 
-    # load keys and other information from test_settings.yml
-    settings = load_yaml_settings(settings_file)
+# load keys and other information from test_settings.yml
+settings = load_yaml_settings(settings_file)
 
-    for case_path in glob:
-        logger.info(f"Generating data for '{case_path}'")
-        generate_test_case_data(case_path, args.type)
+for case_path in glob:
+    logger.info(f"Generating data for '{case_path}'")
+    generate_test_case_data(case_path, args.type)
