@@ -81,12 +81,7 @@ def markdown_disclosures(hash_to_decoded_disclosure, hash_to_disclosure):
 
 def markdown_decoy_digests(decoy_digests):
     # create a list of decoy digests in markdown format
-    decoy_digests = ""
-
-    for digest in decoy_digests:
-        decoy_digests += f" * `{digest}`\n"
-
-    return decoy_digests.strip()
+    return "\n".join(f" * `{digest}`" for digest in decoy_digests)
 
 
 def format_for_testcase(data, ftype):
