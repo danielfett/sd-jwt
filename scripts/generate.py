@@ -106,18 +106,6 @@ def generate_test_case_data(testcase_path: Path, type: str):
             "Combined SD-JWT and Disclosures",
             "txt",
         ),
-        "hb_jwt_payload": (
-            sdjwt_at_holder.holder_binding_jwt_payload
-            if testcase.get("holder_binding")
-            else None,
-            "Payload of the Holder Binding JWT",
-            "json",
-        ),
-        "hb_jwt_serialized": (
-            sdjwt_at_holder.serialized_holder_binding_jwt,
-            "Serialized Holder Binding JWT",
-            "txt",
-        ),
         "combined_presentation": (
             sdjwt_at_holder.combined_presentation,
             "Combined representation of SD-JWT and HS-Disclosures",
@@ -130,30 +118,69 @@ def generate_test_case_data(testcase_path: Path, type: str):
         ),
     }
 
+    if testcase.get("holder_binding", False):
+        _artifacts.update(
+            {
+                "hb_jwt_header": (
+                    sdjwt_at_holder.holder_binding_jwt_header
+                    if testcase.get("holder_binding")
+                    else None,
+                    "Header of the Holder Binding JWT",
+                    "json",
+                ),
+                "hb_jwt_payload": (
+                    sdjwt_at_holder.holder_binding_jwt_payload
+                    if testcase.get("holder_binding")
+                    else None,
+                    "Payload of the Holder Binding JWT",
+                    "json",
+                ),
+                "hb_jwt_serialized": (
+                    sdjwt_at_holder.serialized_holder_binding_jwt,
+                    "Serialized Holder Binding JWT",
+                    "txt",
+                ),
+            }
+        )
+
     # When type is example, add info about disclosures
     if type == "example":
-        _artifacts["disclosures"] = (
-            formatting.markdown_disclosures(
-                sdjwt_at_holder._hash_to_decoded_disclosure,
-                sdjwt_at_holder._hash_to_disclosure,
-            ),
-            "Payloads of the II-Disclosures",
-            "md",
+        _artifacts.update(
+            {
+                "disclosures": (
+                    formatting.markdown_disclosures(
+                        sdjwt_at_holder._hash_to_decoded_disclosure,
+                        sdjwt_at_holder._hash_to_disclosure,
+                    ),
+                    "Payloads of the II-Disclosures",
+                    "md",
+                )
+            }
         )
 
     # When decoys were used, list those as well (here as a json array)
     if use_decoys:
         if type == "example":
-            _artifacts["decoy_digests"] = (
-                formatting.markdown_decoy_digests(sdjwt_at_issuer.decoy_digests),
-                "Decoy Claims",
-                "md",
+            _artifacts.update(
+                {
+                    "decoy_digests": (
+                        formatting.markdown_decoy_digests(
+                            sdjwt_at_issuer.decoy_digests
+                        ),
+                        "Decoy Claims",
+                        "md",
+                    )
+                }
             )
         else:
-            _artifacts["decoy_digests"] = (
-                sdjwt_at_issuer.decoy_digests,
-                "Decoy Claims",
-                "json",
+            _artifacts.update(
+                {
+                    "decoy_digests": (
+                        sdjwt_at_issuer.decoy_digests,
+                        "Decoy Claims",
+                        "json",
+                    )
+                }
             )
 
     output_dir = testcase_path.parent
