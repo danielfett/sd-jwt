@@ -20,5 +20,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-sd-jwt-demo = "sd_jwt.bin.demo:main"
-sd-jwt-generate = "sd_jwt.bin.generate:main"
+sd-jwt-demo = "sd_jwt.bin.demo:run"
+sd-jwt-generate = "sd_jwt.bin.generate:run"
