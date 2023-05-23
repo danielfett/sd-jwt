@@ -24,12 +24,19 @@ def load_yaml_settings(file):
 
 
 def load_yaml_example(file):
+    # Define custom YAML tag to indicate selective disclosure
     class SDKeyTag(yaml.YAMLObject):
         yaml_tag = "!sd"
 
         @classmethod
         def from_yaml(cls, loader, node):
-            return SDKey(loader.construct_scalar(node))
+            if isinstance(node, yaml.ScalarNode):
+                return SDKey(loader.construct_scalar(node))
+            elif isinstance(node, yaml.MappingNode):
+                return SDKey(loader.construct_mapping(node))
+            else:
+                raise Exception("Unsupported node type for selective disclosure (!sd): {}".format(node))
+
 
     with open(file, "r") as f:
         example = yaml.load(f, Loader=yaml.FullLoader)

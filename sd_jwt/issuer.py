@@ -72,8 +72,13 @@ class SDJWTIssuer(SDJWTCommon):
 
         return (hash, raw_b64)
 
-    def _create_sd_claim_entry(self, key, value: any) -> str:
+    def _create_sd_claim_key_value(self, key, value: any) -> str:
         hash, raw_b64 = self._hash_claim(key, value)
+        self.ii_disclosures.append(raw_b64)
+        return hash
+
+    def _create_sd_claim_list_entry(self, list_name, position, value: any) -> str:
+        hash, raw_b64 = self._hash_claim([list_name, position], value)
         self.ii_disclosures.append(raw_b64)
         return hash
 
@@ -82,53 +87,72 @@ class SDJWTIssuer(SDJWTCommon):
         self.decoy_digests.append(digest)
         return digest
 
-    def _create_sd_claims(self, user_claims):
+    def _create_sd_claims(self, user_claims, key_name=""):
         # This function can be called recursively.
         #
         # If the user claims are a list, apply this function
-        # to each item in the list. The first element in non_sd_claims
-        # (which is assumed to be a list as well) is used as the
-        # structure for each item in the list.
+        # to each item in the list. 
         if type(user_claims) is list:
-            return [self._create_sd_claims(claim) for claim in user_claims]
+            return self._create_sd_claims_list(user_claims, key_name)
 
         # If the user claims are a dictionary, apply this function
-        # to each key/value pair in the dictionary. The structure
-        # for each key/value pair is found in the non_sd_claims
-        # dictionary. If the key is not found in the non_sd_claims
-        # dictionary, then the value is assumed to be a claims that
-        # should be selectively disclosable.
+        # to each key/value pair in the dictionary. 
         elif type(user_claims) is dict:
-            sd_claims = {SD_DIGESTS_KEY: []}
-            for key, value in user_claims.items():
-                subtree_from_here = self._create_sd_claims(value)
-                if isinstance(key, SDKey):
-                    # Assemble all hash digests in the disclosures list.
-                    sd_claims[SD_DIGESTS_KEY].append(
-                        self._create_sd_claim_entry(key, subtree_from_here)
-                    )
-                else:
-                    sd_claims[key] = subtree_from_here
-
-            # Add decoy claims if requested
-            if self._add_decoy_claims:
-                for _ in range(
-                    random.randint(self.DECOY_MIN_ELEMENTS, self.DECOY_MAX_ELEMENTS)
-                ):
-                    sd_claims[SD_DIGESTS_KEY].append(self._create_decoy_claim_entry())
-
-            # Delete the SD_DIGESTS_KEY if it is empty
-            if len(sd_claims[SD_DIGESTS_KEY]) == 0:
-                del sd_claims[SD_DIGESTS_KEY]
-            else:
-                # Sort the hash digests otherwise
-                sd_claims[SD_DIGESTS_KEY].sort()
-
-            return sd_claims
+            return self._create_sd_claims_object(user_claims)
 
         # For other types, assume that the value can be disclosed.
         else:
             return user_claims
+        
+    def _create_sd_claims_list(self, user_claims: List, key_name: str):
+        # Walk through all elements in the list.
+        # If an element is marked as SD, then create a proper disclosure for it and replace it with a null value.
+        # Otherwise, just return the element.
+        #
+        # Also keep track of the last non-sd element in the array. Remove all
+        # elements from it until the last non-sd element is reached. Then
+        # return the array.
+
+        last_non_sd_element = None
+        output_user_claims = []
+        for claim in user_claims:
+            if isinstance(claim, SDKey):
+                # Assemble all hash digests in the disclosures list.
+                output_user_claims.append(
+                    self._create_sd_claim_list_entry(key_name, len(output_user_claims), claim)
+                )
+
+
+        #return [self._create_sd_claims(claim) for claim in user_claims]
+
+    def _create_sd_claims_object(self, user_claims: Dict):
+        sd_claims = {SD_DIGESTS_KEY: []}
+        for key, value in user_claims.items():
+            subtree_from_here = self._create_sd_claims(value)
+            if isinstance(key, SDKey):
+                # Assemble all hash digests in the disclosures list.
+                sd_claims[SD_DIGESTS_KEY].append(
+                    self._create_sd_claim_key_value(key, subtree_from_here)
+                )
+            else:
+                sd_claims[key] = subtree_from_here
+
+        # Add decoy claims if requested
+        if self._add_decoy_claims:
+            for _ in range(
+                random.randint(self.DECOY_MIN_ELEMENTS, self.DECOY_MAX_ELEMENTS)
+            ):
+                sd_claims[SD_DIGESTS_KEY].append(self._create_decoy_claim_entry())
+
+        # Delete the SD_DIGESTS_KEY if it is empty
+        if len(sd_claims[SD_DIGESTS_KEY]) == 0:
+            del sd_claims[SD_DIGESTS_KEY]
+        else:
+            # Sort the hash digests otherwise
+            sd_claims[SD_DIGESTS_KEY].sort()
+
+        return sd_claims
+
 
     def _create_signed_jwt(self):
         """

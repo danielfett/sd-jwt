@@ -53,3 +53,7 @@ The script outputs the following files in each test case or example directory:
 
 `verified_contents.json`: The verified contents of the SD-JWT.
 
+## specification.yml
+
+The `specification.yml` file contains the test case or example specifications. It has the following format:
+
