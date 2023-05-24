@@ -5,6 +5,7 @@
     "python.formatting.provider": "none",
     "yaml.customTags": [
         "!sd scalar",
-        "!sd mapping"
+        "!sd mapping",
+        "!sd sequence"
     ]
 }

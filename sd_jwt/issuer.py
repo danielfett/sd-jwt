@@ -88,7 +88,6 @@ class SDJWTIssuer(SDJWTCommon):
 
         # For other types, assume that the value can be disclosed.
         else:
-            print (f"Is other type: {type(user_claims)}, contents = {user_claims}")
             if isinstance(user_claims, SDObj):
                 raise ValueError("SDObj should not be used here")
             return user_claims
