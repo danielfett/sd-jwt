@@ -15,7 +15,7 @@ user_claims:
 
 holder_disclosed_claims:
   addresses:
-    - None
+    - null
     - True
 
 expect_verified_user_claims:

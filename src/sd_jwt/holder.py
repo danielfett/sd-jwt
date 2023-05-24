@@ -71,6 +71,8 @@ class SDJWTHolder(SDJWTCommon):
     def _select_disclosures_list(self, sd_jwt_claims, claims_to_disclose):
         if claims_to_disclose is None:
             return []
+        if claims_to_disclose is True:
+            claims_to_disclose = []
         if not type(claims_to_disclose) is list:
             raise ValueError(
                 f"To disclose array elements, an array must be provided as disclosure information.\n"
@@ -136,10 +138,13 @@ class SDJWTHolder(SDJWTCommon):
     def _select_disclosures_dict(self, sd_jwt_claims, claims_to_disclose):
         if claims_to_disclose is None:
             return {}
+        if claims_to_disclose is True:
+            # Tolerate a "True" for a disclosure of an object
+            claims_to_disclose = {}
         if not type(claims_to_disclose) is dict:
             raise ValueError(
                 f"To disclose object elements, an object must be provided as disclosure information.\n"
-                f"Found {claims_to_disclose} instead.\n"
+                f"Found {claims_to_disclose} (type {type(claims_to_disclose)}) instead.\n"
                 f"Check disclosure information for object: {sd_jwt_claims}"
             )
         for key, value in sd_jwt_claims.items():

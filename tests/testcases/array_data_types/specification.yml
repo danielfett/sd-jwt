@@ -20,10 +20,10 @@ holder_disclosed_claims:
 
 expect_verified_user_claims:
   data_types:
-    - !sd null
-    - !sd 42
-    - !sd 3.14
-    - !sd "foo"
-    - !sd True
-    - !sd ["Test"]  
-    - !sd {"foo": "bar"}
+    - null
+    - 42
+    - 3.14
+    - "foo"
+    - True
+    - ["Test"]  
+    - {"foo": "bar"}

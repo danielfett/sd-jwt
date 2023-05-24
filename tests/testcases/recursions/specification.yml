@@ -20,6 +20,14 @@ user_claims:
       - !sd black
       - !sd white
 
+  animals:
+    !sd snake:
+      !sd name: python
+      !sd age: 10
+    !sd bird:
+      !sd name: eagle
+      !sd age: 20
+
 holder_disclosed_claims:
   foo:
     - False
@@ -36,6 +44,14 @@ holder_disclosed_claims:
     - [False, True]
     - [True, True]
 
+  animals:
+    snake:
+      name: False
+      age: True
+    bird:
+      name: False
+      age: True
+
 expect_verified_user_claims:
   foo:
     - two
@@ -49,3 +65,9 @@ expect_verified_user_claims:
   baz:
     - [purple]
     - [black, white]
+
+  animals:
+    snake:
+      age: 10
+    bird:
+      age: 20
