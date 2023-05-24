@@ -3,7 +3,7 @@ import logging
 from textwrap import fill, wrap
 from pathlib import Path
 
-from sd_jwt.common import SDJWTCommon
+from sd_jwt.common import SDObj
 
 logger = logging.getLogger("sd_jwt")
 

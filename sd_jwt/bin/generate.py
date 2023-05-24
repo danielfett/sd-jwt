@@ -15,10 +15,14 @@ from pathlib import Path
 from sd_jwt import __version__
 from sd_jwt.holder import SDJWTHolder
 from sd_jwt.issuer import SDJWTIssuer
-from sd_jwt.utils.demo_utils import get_jwk, load_yaml_example, load_yaml_settings
+from sd_jwt.utils.demo_utils import get_jwk, load_yaml_settings
 from sd_jwt.verifier import SDJWTVerifier
 
 from sd_jwt.utils import formatting
+from sd_jwt.utils.yaml_specification import (
+    load_yaml_specification,
+    remove_sdobj_wrappers,
+)
 
 logger = logging.getLogger("sd_jwt")
 
@@ -31,7 +35,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     demo_keys = get_jwk(settings["key_settings"], True, seed)
 
     ### Load test case data
-    testcase = load_yaml_example(testcase_path)
+    testcase = load_yaml_specification(testcase_path)
     use_decoys = testcase.get("add_decoy_claims", False)
 
     claims = {
@@ -92,7 +96,11 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     # Write the test case data to the directory of the test case
 
     _artifacts = {
-        "user_claims": (testcase["user_claims"], "User Claims", "json"),
+        "user_claims": (
+            remove_sdobj_wrappers(testcase["user_claims"]),
+            "User Claims",
+            "json",
+        ),
         "sd_jwt_payload": (
             sdjwt_at_issuer.sd_jwt_payload,
             "Payload of the SD-JWT",
@@ -173,6 +181,8 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     for key, data_item in _artifacts.items():
         if data_item is None:
             continue
+
+        logger.info(f"Writing {key} to '{output_dir / key}'.")
 
         data, _, ftype = data_item
 

@@ -8,9 +8,10 @@ from .common import (
     DEFAULT_SIGNING_ALG,
     DIGEST_ALG_KEY,
     SD_DIGESTS_KEY,
-    SD_LIST_PREFIX,
+    DEFAULT_SD_LIST_PREFIX,
+    SD_LIST_PREFIX_KEY,
     SDJWTCommon,
-    SDKey,
+    SDObj,
 )
 from .disclosure import SDJWTDisclosure
 
@@ -42,7 +43,7 @@ class SDJWTIssuer(SDJWTCommon):
         self._holder_key = holder_key
         self._sign_alg = sign_alg or DEFAULT_SIGNING_ALG
         self._add_decoy_claims = add_decoy_claims
-        self._sd_list_prefix = sd_list_prefix or SD_LIST_PREFIX
+        self._sd_list_prefix = sd_list_prefix or DEFAULT_SD_LIST_PREFIX
 
         self.ii_disclosures = []
         self.decoy_digests = []
@@ -64,6 +65,8 @@ class SDJWTIssuer(SDJWTCommon):
             self.sd_jwt_payload["cnf"] = {
                 "jwk": self._holder_key.export_public(as_dict=True)
             }
+        if self._sd_list_prefix != DEFAULT_SD_LIST_PREFIX:
+            self.sd_jwt_payload[SD_LIST_PREFIX_KEY] = self._sd_list_prefix
 
     def _create_decoy_claim_entry(self) -> str:
         digest = self._b64hash(self._generate_salt().encode("ascii"))
@@ -85,6 +88,9 @@ class SDJWTIssuer(SDJWTCommon):
 
         # For other types, assume that the value can be disclosed.
         else:
+            print (f"Is other type: {type(user_claims)}, contents = {user_claims}")
+            if isinstance(user_claims, SDObj):
+                raise ValueError("SDObj should not be used here")
             return user_claims
 
     def _create_sd_claims_list(self, user_claims: List):
@@ -94,12 +100,13 @@ class SDJWTIssuer(SDJWTCommon):
 
         output_user_claims = []
         for claim in user_claims:
-            if isinstance(claim, SDKey):
+            if isinstance(claim, SDObj):
+                subtree_from_here = self._create_sd_claims(claim.value)
                 # Create a new disclosure
                 disclosure = SDJWTDisclosure(
                     self,
                     key=None,
-                    value=self._create_sd_claims(claim),
+                    value=subtree_from_here,
                 )
 
                 # Add to ii_disclosures
@@ -108,7 +115,8 @@ class SDJWTIssuer(SDJWTCommon):
                 # Assemble all hash digests in the disclosures list.
                 output_user_claims.append(self._sd_list_prefix + disclosure.hash)
             else:
-                output_user_claims.append(claim)
+                subtree_from_here = self._create_sd_claims(claim)
+                output_user_claims.append(subtree_from_here)
 
         return output_user_claims
 
@@ -116,11 +124,11 @@ class SDJWTIssuer(SDJWTCommon):
         sd_claims = {SD_DIGESTS_KEY: []}
         for key, value in user_claims.items():
             subtree_from_here = self._create_sd_claims(value)
-            if isinstance(key, SDKey):
+            if isinstance(key, SDObj):
                 # Create a new disclosure
                 disclosure = SDJWTDisclosure(
                     self,
-                    key=str(key),
+                    key=key.value,
                     value=subtree_from_here,
                 )
 

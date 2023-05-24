@@ -15,6 +15,8 @@ class SDJWTDisclosure:
         self._hash()
 
     def _hash(self):
+        print(f"key is {self.key}, type is {type(self.key)}")
+        print(f"value is {self.value}, type is {type(self.value)}")
         self._json = dumps([self.issuer._generate_salt(), self.key, self.value]).encode(
             "utf-8"
         )

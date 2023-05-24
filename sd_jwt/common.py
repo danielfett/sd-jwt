@@ -1,6 +1,7 @@
 import random
 import secrets
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from dataclasses import dataclass
 from hashlib import sha256
 from json import loads
 from typing import List
@@ -8,11 +9,18 @@ from typing import List
 DEFAULT_SIGNING_ALG = "ES256"
 SD_DIGESTS_KEY = "_sd"
 DIGEST_ALG_KEY = "_sd_alg"
-SD_LIST_PREFIX = "_sd:"
+DEFAULT_SD_LIST_PREFIX = "_sd:"
+SD_LIST_PREFIX_KEY = "_sd_arr_pfx"
 
+@dataclass
+class SDObj:
+    """This class can be used to make this part of the object selective disclosable."""
 
-class SDKey(str):
-    """This class can be used in a dictionary to make this part of the dictionary selective disclosable."""
+    value: any
+    
+    # Make hashable
+    def __hash__(self):
+        return hash(self.value)
 
 
 class SDJWTHasSDClaimException(Exception):

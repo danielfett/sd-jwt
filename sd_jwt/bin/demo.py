@@ -11,7 +11,6 @@ from sd_jwt import __version__
 from sd_jwt.utils.demo_utils import (
     get_jwk,
     print_decoded_repr,
-    load_yaml_example,
     load_yaml_settings,
 )
 from sd_jwt.holder import SDJWTHolder
@@ -24,6 +23,7 @@ from sd_jwt.utils.formatting import (
     multiline_code,
     EXAMPLE_SHORT_WIDTH,
 )
+from sd_jwt.utils.yaml_specification import load_yaml_specification
 
 logger = logging.getLogger("sd_jwt")
 
@@ -138,7 +138,7 @@ def run():
     ### Load example file
 
     example_identifer = _args.example.stem
-    example = load_yaml_example(_args.example)
+    example = load_yaml_specification(_args.example)
     use_decoys = example.get("add_decoy_claims", False)
 
     ### Add default claims if necessary

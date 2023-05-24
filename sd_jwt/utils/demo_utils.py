@@ -8,9 +8,8 @@ import sys
 from jwcrypto.jwk import JWK
 from typing import Union
 
-from sd_jwt.common import SDKey
-
 logger = logging.getLogger(__name__)
+
 
 def load_yaml_settings(file):
     with open(file, "r") as f:
@@ -21,31 +20,6 @@ def load_yaml_settings(file):
             sys.exit(f"Settings file must define '{property}'.")
 
     return settings
-
-
-def load_yaml_example(file):
-    # Define custom YAML tag to indicate selective disclosure
-    class SDKeyTag(yaml.YAMLObject):
-        yaml_tag = "!sd"
-
-        @classmethod
-        def from_yaml(cls, loader, node):
-            if isinstance(node, yaml.ScalarNode):
-                return SDKey(loader.construct_scalar(node))
-            elif isinstance(node, yaml.MappingNode):
-                return SDKey(loader.construct_mapping(node))
-            else:
-                raise Exception("Unsupported node type for selective disclosure (!sd): {}".format(node))
-
-
-    with open(file, "r") as f:
-        example = yaml.load(f, Loader=yaml.FullLoader)
-
-    for property in ("user_claims", "holder_disclosed_claims"):
-        if property not in example:
-            sys.exit(f"Example file must define '{property}'.")
-
-    return example
 
 
 def print_repr(values: Union[str, list], nlines=2):
