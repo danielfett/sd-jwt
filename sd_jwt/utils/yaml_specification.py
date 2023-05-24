@@ -58,7 +58,7 @@ Takes an object that has been parsed from a YAML file and removes the SDObj wrap
 """
 def remove_sdobj_wrappers(data):
     if isinstance(data, SDObj):
-        return data.value
+        return remove_sdobj_wrappers(data.value)
     elif isinstance(data, dict):
         return {remove_sdobj_wrappers(key): remove_sdobj_wrappers(value) for key, value in data.items()}
     elif isinstance(data, list):

@@ -109,3 +109,11 @@ class SDJWTCommon:
                 self._check_for_sd_claim(item)
         else:
             return
+
+    def _determine_sd_list_prefix(self, sd_jwt_payload):
+        # Find the sd list prefix if provided, use the default if not
+        if SD_LIST_PREFIX_KEY in sd_jwt_payload:
+            self._sd_list_prefix = sd_jwt_payload[SD_LIST_PREFIX_KEY]
+        else:
+            self._sd_list_prefix = DEFAULT_SD_LIST_PREFIX
+

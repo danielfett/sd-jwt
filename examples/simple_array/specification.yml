@@ -37,8 +37,42 @@ user_claims:
   # What happens with SD arrays in SD arrays?
   nested_array: [[!sd "foo", !sd "bar"], [!sd "baz", !sd "qux"]]
 
+  array_with_recursive_sd:
+    - boring
+    - !sd
+      foo: "bar"
+      !sd baz:
+        qux: "quux"
+    - [!sd "foo", !sd "bar"]
+
+  !sd sd_array:
+    - 32
+    - 23
+
 holder_disclosed_claims:
-  { "given_name": null, "family_name": null, "address": {} }
+  sub: null
+  nationalities: 
+    - False
+    - True
+  
+  is_over:
+    "13": False
+    "18": True
+    "21": False
+
+  addresses: []
+
+  data_types:
+    - True
+    - True
+    - True
+    - True
+    - True
+    - True
+    - True
+
+  nested_array: [[True, False], [False, True]]
+
 
 holder_binding: True
 

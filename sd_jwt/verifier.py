@@ -27,7 +27,7 @@ class SDJWTVerifier(SDJWTCommon):
         if expected_aud or expected_nonce:
             if not (expected_aud and expected_nonce):
                 raise ValueError(
-                    "Either both expected_aud and expected_nonce must be set or both must be None"
+                    "Either both expected_aud and expected_nonce must be provided or both must be None"
                 )
 
             # Verify the SD-JWT-Release
@@ -46,10 +46,10 @@ class SDJWTVerifier(SDJWTCommon):
             self._unverified_input_holder_binding_jwt,
         ) = self._split(combined)
 
-    def _extract_issuer_unverified_from_sd_jwt(self):
+    def _extract_unverified_payload_from_sd_jwt(self):
         # Extracts only the issuer from the raw SD-JWT without verifying the signature
         _, jwt_body, _ = self._unverified_input_sd_jwt.split(".")
-        return loads(self._base64url_decode(jwt_body))["iss"]
+        return loads(self._base64url_decode(jwt_body))
 
     def _verify_sd_jwt(
         self,
@@ -58,11 +58,13 @@ class SDJWTVerifier(SDJWTCommon):
     ):
         parsed_input_sd_jwt = JWS()
         parsed_input_sd_jwt.deserialize(self._unverified_input_sd_jwt)
-        unverified_payload_issuer = self._extract_issuer_unverified_from_sd_jwt()
-        issuer_public_key = cb_get_issuer_key(unverified_payload_issuer)
+        unverified_payload = self._extract_unverified_payload_from_sd_jwt()
+        unverified_issuer = unverified_payload["iss"]
+        issuer_public_key = cb_get_issuer_key(unverified_issuer)
         parsed_input_sd_jwt.verify(issuer_public_key, alg=sign_alg)
 
         self._sd_jwt_payload = loads(parsed_input_sd_jwt.payload.decode("utf-8"))
+        self._determine_sd_list_prefix(self._sd_jwt_payload)
         # TODO: Check exp/nbf/iat
 
         self._holder_public_key_payload = self._sd_jwt_payload.get("cnf", None)
@@ -113,7 +115,18 @@ class SDJWTVerifier(SDJWTCommon):
     def _unpack_disclosed_claims(self, sd_jwt_claims):
         # In a list, unpack each element individually
         if type(sd_jwt_claims) is list:
-            return [self._unpack_disclosed_claims(c) for c in sd_jwt_claims]
+            output = []
+            for element in sd_jwt_claims:
+                if type(element) is str and element.startswith(self._sd_list_prefix):
+                    digest_to_check = element[len(self._sd_list_prefix) :]
+                    if digest_to_check in self._hash_to_decoded_disclosure:
+                        _, key, value = self._hash_to_decoded_disclosure[
+                            digest_to_check
+                        ]
+                        output.append(value)
+                else:
+                    output.append(self._unpack_disclosed_claims(element))
+            return output
 
         elif type(sd_jwt_claims) is dict:
             # First, try to figure out if there are any claims to be
