@@ -1,0 +1,51 @@
+user_claims:
+  foo:
+    - !sd one
+    - !sd two
+
+  bar:
+    !sd red: 1
+    !sd green: 2
+
+  qux:
+    - !sd
+      - !sd blue
+      - !sd yellow
+
+  baz:
+    - !sd
+      - !sd orange
+      - !sd purple
+    - !sd
+      - !sd black
+      - !sd white
+
+holder_disclosed_claims:
+  foo:
+    - False
+    - True
+
+  bar:
+    red: False
+    green: True
+
+  qux:
+    - [False, True]
+
+  baz:
+    - [False, True]
+    - [True, True]
+
+expect_verified_user_claims:
+  foo:
+    - two
+
+  bar:
+    green: 2
+
+  qux: 
+    - [yellow]
+
+  baz:
+    - [purple]
+    - [black, white]

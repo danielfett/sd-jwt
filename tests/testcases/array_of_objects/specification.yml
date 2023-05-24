@@ -1,0 +1,33 @@
+user_claims:
+  addresses:
+    - street: "123 Main St"
+      city: "Anytown"
+      state: "NY"
+      zip: "12345"
+      type: "main_address"
+
+    - !sd
+      street: "456 Main St"
+      city: "Anytown"
+      state: "NY"
+      zip: "12345"
+      type: "secondary_address"
+
+holder_disclosed_claims:
+  addresses:
+    - None
+    - True
+
+expect_verified_user_claims:
+  addresses:
+    - street: "123 Main St"
+      city: "Anytown"
+      state: "NY"
+      zip: "12345"
+      type: "main_address"
+
+    - street: "456 Main St"
+      city: "Anytown"
+      state: "NY"
+      zip: "12345"
+      type: "secondary_address"

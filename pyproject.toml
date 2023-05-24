@@ -4,7 +4,7 @@ version = "0.9.1"
 description = "The reference implementation of the IETF SD-JWT specification."
 authors = ["Daniel Fett <mail@danielfett.de>"]
 readme = "README.md"
-packages = [{include = "sd_jwt"}]
+packages = [{include = "sd_jwt", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -22,3 +22,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 sd-jwt-demo = "sd_jwt.bin.demo:run"
 sd-jwt-generate = "sd_jwt.bin.generate:run"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+pythonpath = ["src"]
