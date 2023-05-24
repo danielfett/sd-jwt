@@ -49,6 +49,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         demo_keys["issuer_key"],
         demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
         add_decoy_claims=use_decoys,
+        sd_list_prefix=testcase.get("sd_list_prefix", None),
     )
 
     ### Produce SD-JWT-R for selected example
@@ -135,8 +136,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     if type == "example":
         _artifacts["disclosures"] = (
             formatting.markdown_disclosures(
-                sdjwt_at_holder._hash_to_decoded_disclosure,
-                sdjwt_at_holder._hash_to_disclosure,
+                sdjwt_at_issuer.ii_disclosures,
             ),
             "Payloads of the II-Disclosures",
             "md",

@@ -61,19 +61,20 @@ def multiline_code(text):
     return "\\\n".join(f"`{line}`" for line in text.splitlines())
 
 
-def markdown_disclosures(hash_to_decoded_disclosure, hash_to_disclosure):
+def markdown_disclosures(disclosures):
     markdown = ""
-    for hash, (salt, claim_name, claim_value) in hash_to_decoded_disclosure.items():
-        b64 = hash_to_disclosure[hash]
-        encoded_json = SDJWTCommon._base64url_decode(b64).decode("utf-8")
+    for d in disclosures:
+        if d.key is None:
+            markdown += f"__Array Entry__:\n\n"
+        else:
+            markdown += f"__Claim `{d.key}`__:\n\n"
 
         markdown += (
-            f"__Claim `{claim_name}`:__\n\n"
-            f" * SHA-256 Hash: `{hash}`\n"
+            f" * SHA-256 Hash: `{d.hash}`\n"
             f" * Disclosure:\\\n"
-            f"{multiline_code(textwrap_text(b64, EXAMPLE_SHORT_WIDTH))}\n"
+            f"{multiline_code(textwrap_text(d.b64, EXAMPLE_SHORT_WIDTH))}\n"
             f" * Contents:\n"
-            f"{multiline_code(textwrap_text(encoded_json, EXAMPLE_SHORT_WIDTH))}\n\n\n"
+            f"{multiline_code(textwrap_text(d.json, EXAMPLE_SHORT_WIDTH))}\n\n\n"
         )
 
     return markdown.strip()

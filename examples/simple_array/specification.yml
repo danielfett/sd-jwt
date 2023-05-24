@@ -1,0 +1,48 @@
+user_claims:
+  !sd sub: john_doe_42
+
+  # Make only first two elements SD - this array will have three elements in the resulting SD-JWT, first two hidden ("null")
+  !sd nationalities: 
+    - !sd "US"
+    - !sd "CA"
+    - "DE"
+
+  # Make all elements SD - this array should completely vanish from the SD-JWT
+  !sd is_over:
+    !sd "13": True
+    !sd "18": False
+    !sd "21": False
+
+  # Make only last element SD - this should be shortened to a one-element array plus the disclosure
+  !sd addresses:
+    - { street: "123 Main St", city: "Anytown", state: "NY", zip: "12345", "type": "main_address" }
+    - !sd { street: "456 Main St", city: "Anytown", state: "NY", zip: "12345", "type": "secondary_address" }
+
+  # Test what happens with existing null values that are being SD'd
+  !sd null_values:
+    - null
+    - !sd null
+    - !sd null
+    - null
+
+  # Test what happens with an array of nulls without SD
+  !sd null_array:
+    - null
+    - null
+    - null
+
+  # Test what happens with an array containing one SD value and some nulls
+  !sd mixed_array:
+    - !sd "foo"
+    - null
+    - null
+
+  # What happens with SD arrays in SD arrays?
+  !sd nested_array: [[!sd "foo", !sd "bar"], [!sd "baz", !sd "qux"]]
+
+holder_disclosed_claims:
+  { "given_name": null, "family_name": null, "address": {} }
+
+holder_binding: True
+
+sd_list_prefix: "_sdx:"

@@ -8,6 +8,7 @@ from typing import List
 DEFAULT_SIGNING_ALG = "ES256"
 SD_DIGESTS_KEY = "_sd"
 DIGEST_ALG_KEY = "_sd_alg"
+SD_LIST_PREFIX = "_sd:"
 
 
 class SDKey(str):
