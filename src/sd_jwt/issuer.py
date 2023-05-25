@@ -112,7 +112,7 @@ class SDJWTIssuer(SDJWTCommon):
                 self.ii_disclosures.append(disclosure)
 
                 # Assemble all hash digests in the disclosures list.
-                output_user_claims.append(self._sd_list_prefix + disclosure.hash)
+                output_user_claims.append({SD_DIGESTS_KEY: disclosure.hash})
             else:
                 subtree_from_here = self._create_sd_claims(claim)
                 output_user_claims.append(subtree_from_here)
