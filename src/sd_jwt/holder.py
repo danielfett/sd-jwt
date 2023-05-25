@@ -157,10 +157,14 @@ class SDJWTHolder(SDJWTCommon):
                     _, key, value = decoded
 
                     try:
+                        print(f"In _select_disclosures_dict: {key}, {value}, {claims_to_disclose}")
                         if key in claims_to_disclose and claims_to_disclose[key]:
+                            print(f"Adding disclosure for {digest_to_check}")
                             self.hs_disclosures.append(
                                 self._hash_to_disclosure[digest_to_check]
                             )
+                        else:
+                            print(f"Not adding disclosure for {digest_to_check}, {key} (type {type(key)}) not in {claims_to_disclose}")
                     except TypeError:
                         # claims_to_disclose is not a dict
                         raise TypeError(

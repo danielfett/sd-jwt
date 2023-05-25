@@ -13,5 +13,5 @@ holder_disclosed_claims:
 
 expect_verified_user_claims:
   is_over:
-    "18": True
+    "18": False
     
