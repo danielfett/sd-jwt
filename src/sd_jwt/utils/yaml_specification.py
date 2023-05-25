@@ -23,7 +23,11 @@ def _yaml_load_specification(f):
 
         @classmethod
         def from_yaml(cls, loader, node):
+            # If this is a scalar node, it can be a string, int, float, etc.; unfortunately, since we tagged
+            # it with !sd, we cannot rely on the default YAML loader to parse it into the correct data type.
+            # Instead, we must manually resolve it.
             if isinstance(node, yaml.ScalarNode):
+                # If the 'style' is '"', then the scalar is a string; otherwise, we must resolve it.
                 if node.style == '"':
                     mp = loader.construct_yaml_str(node)
                 else:
@@ -40,9 +44,7 @@ def _yaml_load_specification(f):
                         mp = None
                     else:
                         raise Exception(
-                            "Unsupported scalar type for selective disclosure (!sd): {}".format(
-                                resolved_type
-                            )
+                            f"Unsupported scalar type for selective disclosure (!sd): {resolved_type}; node is {node}, style is {node.style}"
                         )
                 return SDObj(mp)
             elif isinstance(node, yaml.MappingNode):
