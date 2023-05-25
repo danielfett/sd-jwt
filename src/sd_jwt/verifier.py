@@ -117,8 +117,8 @@ class SDJWTVerifier(SDJWTCommon):
         if type(sd_jwt_claims) is list:
             output = []
             for element in sd_jwt_claims:
-                if type(element) is str and element.startswith(self._sd_list_prefix):
-                    digest_to_check = element[len(self._sd_list_prefix) :]
+                if type(element) is dict and len(element) == 1 and SD_DIGESTS_KEY in element and type(element[SD_DIGESTS_KEY]) is str:
+                    digest_to_check = element[SD_DIGESTS_KEY]
                     if digest_to_check in self._hash_to_decoded_disclosure:
                         _, value = self._hash_to_decoded_disclosure[digest_to_check]
                         output.append(self._unpack_disclosed_claims(value))
