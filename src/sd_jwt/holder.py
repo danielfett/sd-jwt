@@ -90,8 +90,7 @@ class SDJWTHolder(SDJWTCommon):
                     continue
 
                 # Determine type of disclosure
-                decoded = self._hash_to_decoded_disclosure[digest_to_check]
-                _, disclosure_key, disclosure_value = decoded
+                _, disclosure_value = self._hash_to_decoded_disclosure[digest_to_check]
 
                 # Disclose the claim only if in claims_to_disclose (assumed to be an array)
                 # there is an element with the current index and it is not None or False
@@ -153,8 +152,7 @@ class SDJWTHolder(SDJWTCommon):
                     if digest_to_check not in self._hash_to_decoded_disclosure:
                         # fake digest
                         continue
-                    decoded = self._hash_to_decoded_disclosure[digest_to_check]
-                    _, key, value = decoded
+                    _, key, value = self._hash_to_decoded_disclosure[digest_to_check]
 
                     try:
                         print(f"In _select_disclosures_dict: {key}, {value}, {claims_to_disclose}")

@@ -120,9 +120,7 @@ class SDJWTVerifier(SDJWTCommon):
                 if type(element) is str and element.startswith(self._sd_list_prefix):
                     digest_to_check = element[len(self._sd_list_prefix) :]
                     if digest_to_check in self._hash_to_decoded_disclosure:
-                        _, key, value = self._hash_to_decoded_disclosure[
-                            digest_to_check
-                        ]
+                        _, value = self._hash_to_decoded_disclosure[digest_to_check]
                         output.append(self._unpack_disclosed_claims(value))
                 else:
                     output.append(self._unpack_disclosed_claims(element))

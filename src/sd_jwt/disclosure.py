@@ -15,11 +15,13 @@ class SDJWTDisclosure:
         self._hash()
 
     def _hash(self):
-        print(f"key is {self.key}, type is {type(self.key)}")
-        print(f"value is {self.value}, type is {type(self.value)}")
-        self._json = dumps([self.issuer._generate_salt(), self.key, self.value]).encode(
-            "utf-8"
-        )
+        salt = self.issuer._generate_salt()
+        if self.key is None:
+            data = [salt, self.value]
+        else:
+            data = [salt, self.key, self.value]
+
+        self._json = dumps(data).encode("utf-8")
 
         self._raw_b64 = self.issuer._base64url_encode(self._json)
         self._hash = self.issuer._b64hash(self._raw_b64.encode("ascii"))
