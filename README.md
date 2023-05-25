@@ -44,7 +44,7 @@ The script outputs the following files in each test case or example directory:
  * `hb_jwt_serialized.txt`: The serialized holder binding JWT.
  * `verified_contents.json`: The verified contents of the SD-JWT.
 
-To run the script, do enter the respective directory and executy `sd-jwt-generate`:
+To run the script, enter the respective directory and execut `sd-jwt-generate`:
 
 ```bash
 cd tests/testcases
@@ -61,19 +61,20 @@ property is contained, which is the expected output of the verifier.
 
 Implementers of SD-JWT libraries are advised to run at least the following tests:
 
-  - End-to-end: The holder creates an SD-JWT according to the input data, the
+  - End-to-end: The issuer creates an SD-JWT according to the input data, the
     holder discloses the claims according to the holder disclosed claims, and
     the verifier verifies the SD-JWT and outputs the expected verified contents.
     The test passes if the output of the verifier matches the expected verified
     contents.
-  - Issuer-direct-to-holder: The holder creates an SD-JWT according to the input
-    data and the whole SD-JWT is directly put into the Verifier for consumption.
+  - Issuer-direct-to-holder: The issuer creates an SD-JWT according to the input
+    data and the whole SD-JWT is put directly into the Verifier for consumption.
     (Note that this is possible because an SD-JWT presentation differs only by
     one '~' character from the SD-JWT issued by the issuer if holder binding is
-    not enforced.) This test simulates that a holder releases all data contained
-    in the SD-JWT and is useful to verify that the Issuer put all data into the
-    SD-JWT in a correct way. The test passes if the output of the verifier
-    matches the input user claims.
+    not enforced. This character can easily be added in the test execution.)
+    This test simulates that a holder releases all data contained in the SD-JWT
+    and is useful to verify that the Issuer put all data into the SD-JWT in a
+    correct way. The test passes if the output of the verifier matches the input
+    user claims (including all claims marked for selective disclosure).
 
 In this library, the two tests are implemented in
 [tests/test_e2e_testcases.py](tests/test_e2e_testcases.py) and
