@@ -1,14 +1,33 @@
-**Note: This is work in progress to transfer the SD-JWT implementation from https://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/ into this repository. Until this is done, please refer to the original repository.**
-
 # SD-JWT Reference Implementation
 
 This is a reference implementation of the [IETF SD-JWT specification](https://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/). It is written in Python.
 
 This implementation is used to generate the examples in the specification, but can also be used as a library in other projects.
 
-## generate.py
+## Setup
 
-The script `generate.py` can be used for generating test cases (for consumption by other SD-JWT implementations) and for generating the examples in the SD-JWT specification and other documents.
+To install this implementation, make sure that `python3` and `pip` (or `pip3`) are available on your system and run the following command:
+
+```bash
+# create a virtual environment to install the dependencies
+python3 -m venv venv
+source venv/bin/activate
+
+# install the latest version from git
+pip install git+https://github.com/danielfett/sd-jwt.git
+```
+
+This will install the `sdjwt` python package and the `sd-jwt-generate` script.
+
+If you want to access the scripts again in a new shell, you have to activate the virtual environment again:
+
+```bash
+source venv/bin/activate
+```
+
+## sd-jwt-generate
+
+The script `sd-jwt-generate` can be used for generating test cases (for consumption by other SD-JWT implementations) and for generating the examples in the SD-JWT specification and other documents.
 
 For both use cases, the script expects a JSON file with settings (`settings.yml`). Examples for these files can be found in the `test_cases` and `examples` directories.
 

@@ -9,6 +9,7 @@ library that affect the test cases.
 import argparse
 import logging
 import sys
+from typing import Dict
 from pathlib import Path
 
 from sd_jwt import __version__
@@ -25,7 +26,7 @@ logger = logging.getLogger("sd_jwt")
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
-def generate_test_case_data(testcase_path: Path, type: str):
+def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     seed = settings["random_seed"]
     demo_keys = get_jwk(settings["key_settings"], True, seed)
 
@@ -207,7 +208,7 @@ def generate_test_case_data(testcase_path: Path, type: str):
 
 
 # For all *.yml files in subdirectories of the working directory, run the test case generation
-if __name__ == "__main__":
+def run():
     # This tool must be called with either "testcase" or "example" as the first argument in order
     # to specify which type of output to generate.
 
@@ -255,4 +256,8 @@ if __name__ == "__main__":
 
     for case_path in glob:
         logger.info(f"Generating data for '{case_path}'")
-        generate_test_case_data(case_path, args.type)
+        generate_test_case_data(settings, case_path, args.type)
+
+
+if __name__ == "__main__":
+    run()
