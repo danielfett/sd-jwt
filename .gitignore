@@ -162,8 +162,8 @@ cython_debug/
 
 # Ignore output of test cases except for specification.yml
 
-test_cases/*/*
-!test_cases/*/specification.yml
+tests/testcases/*/*
+!tests/testcases/*/specification.yml
 
 # Ignore output of examples except for specification.yml
 examples/*/*
