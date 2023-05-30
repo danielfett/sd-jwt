@@ -1,4 +1,4 @@
-from .common import SDJWTCommon, DEFAULT_SIGNING_ALG, SD_DIGESTS_KEY
+from .common import SDJWTCommon, DEFAULT_SIGNING_ALG, SD_DIGESTS_KEY, SD_LIST_PREFIX
 from json import dumps, loads
 from time import time
 from typing import Dict, List, Optional
@@ -22,7 +22,6 @@ class SDJWTHolder(SDJWTCommon):
         self._parse_combined_sd_jwt_iid(combined_sd_jwt_iid)
         self._create_hash_mappings(self._ii_disclosures)
         self._extract_payload_unverified()
-        self._determine_sd_list_prefix(self.sd_jwt_payload)
 
     def _parse_combined_sd_jwt_iid(self, combined):
         self.serialized_sd_jwt, *self._ii_disclosures = self._split(combined)
@@ -83,8 +82,13 @@ class SDJWTHolder(SDJWTCommon):
         for pos, (claims_to_disclose_element, element) in enumerate(
             zip_longest(claims_to_disclose, sd_jwt_claims, fillvalue=None)
         ):
-            if type(element) is dict and len(element) == 1 and SD_DIGESTS_KEY in element and type(element[SD_DIGESTS_KEY]) is str:
-                digest_to_check = element[SD_DIGESTS_KEY]
+            if (
+                type(element) is dict
+                and len(element) == 1
+                and SD_LIST_PREFIX in element
+                and type(element[SD_LIST_PREFIX]) is str
+            ):
+                digest_to_check = element[SD_LIST_PREFIX]
                 if digest_to_check not in self._hash_to_decoded_disclosure:
                     # fake digest
                     continue
@@ -94,42 +98,42 @@ class SDJWTHolder(SDJWTCommon):
 
                 # Disclose the claim only if in claims_to_disclose (assumed to be an array)
                 # there is an element with the current index and it is not None or False
-                if claims_to_disclose_element not in (
+                if claims_to_disclose_element in (
                     False,
                     None,
                 ):
-                    self.hs_disclosures.append(
-                        self._hash_to_disclosure[digest_to_check]
-                    )
-                    if type(disclosure_value) is dict:
-                        if claims_to_disclose_element is True:
-                            # Tolerate a "True" for a disclosure of an object
-                            claims_to_disclose_element = {}
-                        if not type(claims_to_disclose_element) is dict:
-                            raise ValueError(
-                                f"To disclose object elements in arrays, provide an object (can be empty).\n"
-                                f"Found {claims_to_disclose_element} instead.\n"
-                                f"Problem at position {pos} of {claims_to_disclose}.\n"
-                                f"Check disclosure information for object: {sd_jwt_claims}"
-                            )
-                        self._select_disclosures(
-                            disclosure_value, claims_to_disclose_element
-                        )
-                    elif type(disclosure_value) is list:
-                        if claims_to_disclose_element is True:
-                            # Tolerate a "True" for a disclosure of an array
-                            claims_to_disclose_element = []
-                        if not type(claims_to_disclose_element) is list:
-                            raise ValueError(
-                                f"To disclose array elements nested in arrays, provide an array (can be empty).\n"
-                                f"Found {claims_to_disclose_element} instead.\n"
-                                f"Problem at position {pos} of {claims_to_disclose}.\n"
-                                f"Check disclosure information for array: {sd_jwt_claims}"
-                            )
+                    continue
 
-                        self._select_disclosures(
-                            disclosure_value, claims_to_disclose_element
+                self.hs_disclosures.append(self._hash_to_disclosure[digest_to_check])
+                if type(disclosure_value) is dict:
+                    if claims_to_disclose_element is True:
+                        # Tolerate a "True" for a disclosure of an object
+                        claims_to_disclose_element = {}
+                    if not type(claims_to_disclose_element) is dict:
+                        raise ValueError(
+                            f"To disclose object elements in arrays, provide an object (can be empty).\n"
+                            f"Found {claims_to_disclose_element} instead.\n"
+                            f"Problem at position {pos} of {claims_to_disclose}.\n"
+                            f"Check disclosure information for object: {sd_jwt_claims}"
                         )
+                    self._select_disclosures(
+                        disclosure_value, claims_to_disclose_element
+                    )
+                elif type(disclosure_value) is list:
+                    if claims_to_disclose_element is True:
+                        # Tolerate a "True" for a disclosure of an array
+                        claims_to_disclose_element = []
+                    if not type(claims_to_disclose_element) is list:
+                        raise ValueError(
+                            f"To disclose array elements nested in arrays, provide an array (can be empty).\n"
+                            f"Found {claims_to_disclose_element} instead.\n"
+                            f"Problem at position {pos} of {claims_to_disclose}.\n"
+                            f"Check disclosure information for array: {sd_jwt_claims}"
+                        )
+
+                    self._select_disclosures(
+                        disclosure_value, claims_to_disclose_element
+                    )
 
             else:
                 self._select_disclosures(element, claims_to_disclose_element)
@@ -155,14 +159,18 @@ class SDJWTHolder(SDJWTCommon):
                     _, key, value = self._hash_to_decoded_disclosure[digest_to_check]
 
                     try:
-                        print(f"In _select_disclosures_dict: {key}, {value}, {claims_to_disclose}")
+                        print(
+                            f"In _select_disclosures_dict: {key}, {value}, {claims_to_disclose}"
+                        )
                         if key in claims_to_disclose and claims_to_disclose[key]:
                             print(f"Adding disclosure for {digest_to_check}")
                             self.hs_disclosures.append(
                                 self._hash_to_disclosure[digest_to_check]
                             )
                         else:
-                            print(f"Not adding disclosure for {digest_to_check}, {key} (type {type(key)}) not in {claims_to_disclose}")
+                            print(
+                                f"Not adding disclosure for {digest_to_check}, {key} (type {type(key)}) not in {claims_to_disclose}"
+                            )
                     except TypeError:
                         # claims_to_disclose is not a dict
                         raise TypeError(

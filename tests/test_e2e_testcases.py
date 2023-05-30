@@ -23,7 +23,6 @@ def test_e2e(testcase, settings):
         if testcase.get("holder_binding", False)
         else None,
         add_decoy_claims=use_decoys,
-        sd_list_prefix=testcase.get("sd_list_prefix", None),
     )
 
     output_issuance = sdjwt_at_issuer.combined_sd_jwt_iid

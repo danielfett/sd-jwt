@@ -8,8 +8,7 @@ from .common import (
     DEFAULT_SIGNING_ALG,
     DIGEST_ALG_KEY,
     SD_DIGESTS_KEY,
-    DEFAULT_SD_LIST_PREFIX,
-    SD_LIST_PREFIX_KEY,
+    SD_LIST_PREFIX,
     SDJWTCommon,
     SDObj,
 )
@@ -36,14 +35,12 @@ class SDJWTIssuer(SDJWTCommon):
         holder_key=None,
         sign_alg=None,
         add_decoy_claims: bool = False,
-        sd_list_prefix: Optional[str] = None,
     ):
         self._user_claims = user_claims
         self._issuer_key = issuer_key
         self._holder_key = holder_key
         self._sign_alg = sign_alg or DEFAULT_SIGNING_ALG
         self._add_decoy_claims = add_decoy_claims
-        self._sd_list_prefix = sd_list_prefix or DEFAULT_SD_LIST_PREFIX
 
         self.ii_disclosures = []
         self.decoy_digests = []
@@ -65,8 +62,6 @@ class SDJWTIssuer(SDJWTCommon):
             self.sd_jwt_payload["cnf"] = {
                 "jwk": self._holder_key.export_public(as_dict=True)
             }
-        if self._sd_list_prefix != DEFAULT_SD_LIST_PREFIX:
-            self.sd_jwt_payload[SD_LIST_PREFIX_KEY] = self._sd_list_prefix
 
     def _create_decoy_claim_entry(self) -> str:
         digest = self._b64hash(self._generate_salt().encode("ascii"))
@@ -112,7 +107,7 @@ class SDJWTIssuer(SDJWTCommon):
                 self.ii_disclosures.append(disclosure)
 
                 # Assemble all hash digests in the disclosures list.
-                output_user_claims.append({SD_DIGESTS_KEY: disclosure.hash})
+                output_user_claims.append({SD_LIST_PREFIX: disclosure.hash})
             else:
                 subtree_from_here = self._create_sd_claims(claim)
                 output_user_claims.append(subtree_from_here)

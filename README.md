@@ -44,7 +44,7 @@ The script outputs the following files in each test case or example directory:
  * `hb_jwt_serialized.txt`: The serialized holder binding JWT.
  * `verified_contents.json`: The verified contents of the SD-JWT.
 
-To run the script, enter the respective directory and execut `sd-jwt-generate`:
+To run the script, enter the respective directory and execute `sd-jwt-generate`:
 
 ```bash
 cd tests/testcases

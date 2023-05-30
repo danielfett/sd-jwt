@@ -1,4 +1,10 @@
-from .common import SDJWTCommon, DEFAULT_SIGNING_ALG, DIGEST_ALG_KEY, SD_DIGESTS_KEY
+from .common import (
+    SDJWTCommon,
+    DEFAULT_SIGNING_ALG,
+    DIGEST_ALG_KEY,
+    SD_DIGESTS_KEY,
+    SD_LIST_PREFIX,
+)
 
 from json import dumps, loads
 from typing import Dict, List, Union, Callable
@@ -64,7 +70,6 @@ class SDJWTVerifier(SDJWTCommon):
         parsed_input_sd_jwt.verify(issuer_public_key, alg=sign_alg)
 
         self._sd_jwt_payload = loads(parsed_input_sd_jwt.payload.decode("utf-8"))
-        self._determine_sd_list_prefix(self._sd_jwt_payload)
         # TODO: Check exp/nbf/iat
 
         self._holder_public_key_payload = self._sd_jwt_payload.get("cnf", None)
@@ -117,8 +122,13 @@ class SDJWTVerifier(SDJWTCommon):
         if type(sd_jwt_claims) is list:
             output = []
             for element in sd_jwt_claims:
-                if type(element) is dict and len(element) == 1 and SD_DIGESTS_KEY in element and type(element[SD_DIGESTS_KEY]) is str:
-                    digest_to_check = element[SD_DIGESTS_KEY]
+                if (
+                    type(element) is dict
+                    and len(element) == 1
+                    and SD_LIST_PREFIX in element
+                    and type(element[SD_LIST_PREFIX]) is str
+                ):
+                    digest_to_check = element[SD_LIST_PREFIX]
                     if digest_to_check in self._hash_to_decoded_disclosure:
                         _, value = self._hash_to_decoded_disclosure[digest_to_check]
                         output.append(self._unpack_disclosed_claims(value))
