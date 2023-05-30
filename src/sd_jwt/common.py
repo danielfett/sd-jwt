@@ -9,8 +9,7 @@ from typing import List
 DEFAULT_SIGNING_ALG = "ES256"
 SD_DIGESTS_KEY = "_sd"
 DIGEST_ALG_KEY = "_sd_alg"
-DEFAULT_SD_LIST_PREFIX = "_sd:"
-SD_LIST_PREFIX_KEY = "_sd_arr_pfx"
+SD_LIST_PREFIX = "..."
 
 @dataclass
 class SDObj:
@@ -109,11 +108,4 @@ class SDJWTCommon:
                 self._check_for_sd_claim(item)
         else:
             return
-
-    def _determine_sd_list_prefix(self, sd_jwt_payload):
-        # Find the sd list prefix if provided, use the default if not
-        if SD_LIST_PREFIX_KEY in sd_jwt_payload:
-            self._sd_list_prefix = sd_jwt_payload[SD_LIST_PREFIX_KEY]
-        else:
-            self._sd_list_prefix = DEFAULT_SD_LIST_PREFIX
 
