@@ -101,6 +101,11 @@ class SDJWTVerifier(SDJWTCommon):
 
         parsed_input_holder_binding_jwt.verify(pubkey, alg=_alg)
 
+        holder_binding_jwt_header = parsed_input_holder_binding_jwt.jose_header
+
+        if holder_binding_jwt_header["typ"] != self.SD_JWT_R_HEADER:
+            raise ValueError("Invalid header typ")
+
         holder_binding_jwt_payload = loads(parsed_input_holder_binding_jwt.payload)
 
         if holder_binding_jwt_payload["aud"] != expected_aud:
