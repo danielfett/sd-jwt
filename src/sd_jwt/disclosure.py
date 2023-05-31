@@ -7,7 +7,7 @@ from typing import Optional
 class SDJWTDisclosure:
     """This class represents a disclosure of a claim."""
 
-    issuer: "SDJWTIssuer"
+    issuer: any
     key: Optional[str]  # only for object keys
     value: any
 
