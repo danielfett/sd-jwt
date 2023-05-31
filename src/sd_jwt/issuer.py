@@ -1,6 +1,6 @@
 import random
 from json import dumps
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from jwcrypto.jws import JWS
 
