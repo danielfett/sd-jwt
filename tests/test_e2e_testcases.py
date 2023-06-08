@@ -20,7 +20,7 @@ def test_e2e(testcase, settings):
         user_claims,
         demo_keys["issuer_key"],
         demo_keys["holder_key"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
         add_decoy_claims=use_decoys,
     )
@@ -32,14 +32,14 @@ def test_e2e(testcase, settings):
     sdjwt_at_holder = SDJWTHolder(output_issuance)
     sdjwt_at_holder.create_presentation(
         testcase["holder_disclosed_claims"],
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
+        settings["key_binding_nonce"]
+        if testcase.get("key_binding", False)
         else None,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
         demo_keys["holder_key"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
     )
 
@@ -53,10 +53,10 @@ def test_e2e(testcase, settings):
         output_holder,
         cb_get_issuer_key,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
+        settings["key_binding_nonce"]
+        if testcase.get("key_binding", False)
         else None,
     )
     verified = sdjwt_at_verifier.get_verified_payload()
