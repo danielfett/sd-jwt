@@ -40,8 +40,8 @@ The script outputs the following files in each test case or example directory:
  * `user_claims.json`: The user claims.
  * `sd_jwt_payload.json`: The payload of the SD-JWT.
  * `sd_jwt_serialized.txt`: The serialized SD-JWT.
- * `hb_jwt_payload.json`: The payload of the key binding JWT.
- * `hb_jwt_serialized.txt`: The serialized key binding JWT.
+ * `kb_jwt_payload.json`: The payload of the key binding JWT.
+ * `kb_jwt_serialized.txt`: The serialized key binding JWT.
  * `verified_contents.json`: The verified contents of the SD-JWT.
 
 To run the script, enter the respective directory and execute `sd-jwt-generate`:

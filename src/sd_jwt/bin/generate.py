@@ -130,21 +130,21 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     if testcase.get("key_binding", False):
         _artifacts.update(
             {
-                "hb_jwt_header": (
+                "kb_jwt_header": (
                     sdjwt_at_holder.key_binding_jwt_header
                     if testcase.get("key_binding")
                     else None,
                     "Header of the Holder Binding JWT",
                     "json",
                 ),
-                "hb_jwt_payload": (
+                "kb_jwt_payload": (
                     sdjwt_at_holder.key_binding_jwt_payload
                     if testcase.get("key_binding")
                     else None,
                     "Payload of the Holder Binding JWT",
                     "json",
                 ),
-                "hb_jwt_serialized": (
+                "kb_jwt_serialized": (
                     sdjwt_at_holder.serialized_key_binding_jwt,
                     "Serialized Holder Binding JWT",
                     "txt",

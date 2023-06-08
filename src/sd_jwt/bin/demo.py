@@ -228,14 +228,14 @@ def run():
             "Combined SD-JWT and Disclosures",
             "txt",
         ),
-        "hb_jwt_payload": (
+        "kb_jwt_payload": (
             sdjwt_at_holder.key_binding_jwt_payload
             if example.get("key_binding")
             else None,
             "Payload of the Holder Binding JWT",
             "json",
         ),
-        "hb_jwt_serialized": (
+        "kb_jwt_serialized": (
             sdjwt_at_holder.serialized_key_binding_jwt,
             "Serialized Holder Binding JWT",
             "txt",
