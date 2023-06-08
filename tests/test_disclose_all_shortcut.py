@@ -27,7 +27,7 @@ def test_e2e(testcase, settings):
 
     # This test skips the holder's part and goes straight to the verifier.
     # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
-    # We also disable holder binding checks.
+    # We also disable key binding checks.
 
     output_holder = output_issuance + "~"
 

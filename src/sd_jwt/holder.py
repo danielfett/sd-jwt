@@ -42,12 +42,12 @@ class SDJWTHolder(SDJWTCommon):
         self.hs_disclosures = []
         self._select_disclosures(self.sd_jwt_payload, claims_to_disclose)
 
-        # Optional: Create a holder binding JWT
+        # Optional: Create a key binding JWT
         if nonce and aud and holder_key:
             self._create_key_binding_jwt(nonce, aud, holder_key, sign_alg)
 
         # Create the combined presentation
-        # Note: If the holder binding JWT is not created, then the
+        # Note: If the key binding JWT is not created, then the
         # last element is empty, matching the spec.
         self.combined_presentation = self._combine(
             self.serialized_sd_jwt,
