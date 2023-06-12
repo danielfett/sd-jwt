@@ -103,7 +103,7 @@ class SDJWTVerifier(SDJWTCommon):
 
         key_binding_jwt_header = parsed_input_key_binding_jwt.jose_header
 
-        if key_binding_jwt_header["typ"] != self.SD_JWT_R_HEADER:
+        if key_binding_jwt_header["typ"] != self.KB_JWT_TYP_HEADER:
             raise ValueError("Invalid header typ")
 
         key_binding_jwt_payload = loads(parsed_input_key_binding_jwt.payload)

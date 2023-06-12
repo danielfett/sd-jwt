@@ -190,7 +190,7 @@ class SDJWTHolder(SDJWTCommon):
 
         self.key_binding_jwt_header = {
             "alg": _alg,
-            "typ": self.SD_JWT_R_HEADER,
+            "typ": self.KB_JWT_TYP_HEADER,
         }
 
         self.key_binding_jwt_payload = {

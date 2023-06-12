@@ -33,7 +33,7 @@ class SDJWTHasSDClaimException(Exception):
 
 class SDJWTCommon:
     SD_JWT_HEADER = None  # "sd+jwt"
-    SD_JWT_R_HEADER = "kb+jwt"
+    KB_JWT_TYP_HEADER = "kb+jwt"
     # TODO: adopt a dynamic module/package loader, defs could be as string -> "fn": "hashlib.sha256"
     HASH_ALG = {"name": "sha-256", "fn": sha256}
 
