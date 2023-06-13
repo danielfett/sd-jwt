@@ -185,12 +185,9 @@ class SDJWTIssuer(SDJWTCommon):
         # There does not seem to be a straightforward way to do that with the library
         # other than JSON-decoding the JWS and JSON-encoding it again.
         if self._serialization_format == "json":
-            self.serialized_sd_jwt = dumps(
-                loads(self.serialized_sd_jwt)
-                | {self.JWS_KEY_DISCLOSURES: [d.b64 for d in self.ii_disclosures]}
-            )
-
-            print(self.serialized_sd_jwt)
+            jws_content = loads(self.serialized_sd_jwt)
+            jws_content[self.JWS_KEY_DISCLOSURES] = [d.b64 for d in self.ii_disclosures]
+            self.serialized_sd_jwt = dumps(jws_content)
 
     def _create_combined(self):
         if self._serialization_format == "compact":
