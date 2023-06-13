@@ -162,3 +162,7 @@ Finally, `expect_verified_user_claims` describes what the verifier is expected
 to output after successfully consuming the presentation from the holder. In
 other words, after applying `holder_disclosed_claims` to `user_claims`, the
 result is `expect_verified_user_claims`.
+
+### Other Properties
+
+When `holder_binding` is set to `true`, a Holder Binding JWT will be generated.
