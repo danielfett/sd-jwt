@@ -168,3 +168,6 @@ result is `expect_verified_user_claims`.
 ### Other Properties
 
 When `holder_binding` is set to `true`, a Holder Binding JWT will be generated.
+
+Using `serialization_format`, the serialization format of the SD-JWT can be
+specified. The default is `compact`, but `json` is also supported.
