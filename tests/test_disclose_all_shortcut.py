@@ -19,7 +19,7 @@ def test_e2e(testcase, settings):
     sdjwt_at_issuer = SDJWTIssuer(
         user_claims,
         demo_keys["issuer_key"],
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
     )
 
@@ -27,7 +27,7 @@ def test_e2e(testcase, settings):
 
     # This test skips the holder's part and goes straight to the verifier.
     # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
-    # We also disable holder binding checks.
+    # We also disable key binding checks.
 
     output_holder = output_issuance + "~"
 

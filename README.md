@@ -40,8 +40,8 @@ The script outputs the following files in each test case or example directory:
  * `user_claims.json`: The user claims.
  * `sd_jwt_payload.json`: The payload of the SD-JWT.
  * `sd_jwt_serialized.txt`: The serialized SD-JWT.
- * `hb_jwt_payload.json`: The payload of the holder binding JWT.
- * `hb_jwt_serialized.txt`: The serialized holder binding JWT.
+ * `kb_jwt_payload.json`: The payload of the key binding JWT.
+ * `kb_jwt_serialized.txt`: The serialized key binding JWT.
  * `verified_contents.json`: The verified contents of the SD-JWT.
 
 To run the script, enter the respective directory and execute `sd-jwt-generate`:
@@ -69,7 +69,7 @@ Implementers of SD-JWT libraries are advised to run at least the following tests
   - Issuer-direct-to-holder: The issuer creates an SD-JWT according to the input
     data and the whole SD-JWT is put directly into the Verifier for consumption.
     (Note that this is possible because an SD-JWT presentation differs only by
-    one '~' character from the SD-JWT issued by the issuer if holder binding is
+    one '~' character from the SD-JWT issued by the issuer if key binding is
     not enforced. This character can easily be added in the test execution.)
     This test simulates that a holder releases all data contained in the SD-JWT
     and is useful to verify that the Issuer put all data into the SD-JWT in a
@@ -165,4 +165,4 @@ result is `expect_verified_user_claims`.
 
 ### Other Properties
 
-When `holder_binding` is set to `true`, a Holder Binding JWT will be generated.
+When `key_binding` is set to `true`, a Key Binding JWT will be generated.

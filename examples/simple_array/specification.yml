@@ -74,7 +74,7 @@ holder_disclosed_claims:
   nested_array: [[True, False], [False, True]]
 
 
-holder_binding: True
+key_binding: True
 
 # Test an alternative prefix for SD claims in lists
 sd_list_prefix: "_sdx:"
