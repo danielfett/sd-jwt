@@ -35,7 +35,10 @@ class SDJWTIssuer(SDJWTCommon):
         holder_key=None,
         sign_alg=None,
         add_decoy_claims: bool = False,
+        serialization_format: str = "compact",
     ):
+        super().__init__(serialization_format=serialization_format)
+
         self._user_claims = user_claims
         self._issuer_key = issuer_key
         self._holder_key = holder_key
@@ -47,7 +50,7 @@ class SDJWTIssuer(SDJWTCommon):
 
         self._check_for_sd_claim(self._user_claims)
         self._assemble_sd_jwt_payload()
-        self._create_signed_jwt()
+        self._create_signed_jws()
         self._create_combined()
 
     def _assemble_sd_jwt_payload(self):
@@ -84,7 +87,9 @@ class SDJWTIssuer(SDJWTCommon):
         # For other types, assume that the value can be disclosed.
         else:
             if isinstance(user_claims, SDObj):
-                raise ValueError(f"SDObj found in illegal place.\nThe claim value '{user_claims}' should not be wrapped by SDObj.")
+                raise ValueError(
+                    f"SDObj found in illegal place.\nThe claim value '{user_claims}' should not be wrapped by SDObj."
+                )
             return user_claims
 
     def _create_sd_claims_list(self, user_claims: List):
@@ -150,24 +155,42 @@ class SDJWTIssuer(SDJWTCommon):
 
         return sd_claims
 
-    def _create_signed_jwt(self):
+    def _create_signed_jws(self):
         """
-        Create the SD-JWT
+        Create the SD-JWT.
+
+        If serialization_format is "compact", then the SD-JWT is a JWT (JWS in compact serialization).
+        If serialization_format is "json", then the SD-JWT is a JWS in JSON serialization. The disclosures in this case
+        will be added in a separate "disclosures" property of the JSON.
         """
 
-        # Sign the SD-JWT using the issuer's key
         self.sd_jwt = JWS(payload=dumps(self.sd_jwt_payload))
-        _headers = {"alg": self._sign_alg}
+
+        # Assemble protected headers
+        _protected_headers = {"alg": self._sign_alg}
         if self.SD_JWT_HEADER:
-            _headers["typ"] = self.SD_JWT_HEADER
+            _protected_headers["typ"] = self.SD_JWT_HEADER
+
+        # If serialization_format is "json", then add the disclosures in the unprotected headers
+        if self._serialization_format == "json":
+            _unprotected_headers = {"disclosures": [d.b64 for d in self.ii_disclosures]}
+        else:
+            _unprotected_headers = None
+
         self.sd_jwt.add_signature(
             self._issuer_key,
             alg=self._sign_alg,
-            protected=dumps(_headers),
+            protected=dumps(_protected_headers),
+            header=_unprotected_headers,
         )
-        self.serialized_sd_jwt = self.sd_jwt.serialize(compact=True)
+        self.serialized_sd_jwt = self.sd_jwt.serialize(
+            compact=(self._serialization_format == "compact")
+        )
 
     def _create_combined(self):
-        self.combined_sd_jwt_iid = self._combine(
-            self.serialized_sd_jwt, *(d.b64 for d in self.ii_disclosures)
-        )
+        if self._serialization_format == "compact":
+            self.combined_sd_jwt_iid = self._combine(
+                self.serialized_sd_jwt, *(d.b64 for d in self.ii_disclosures)
+            )
+        else:
+            self.combined_sd_jwt_iid = self.serialized_sd_jwt

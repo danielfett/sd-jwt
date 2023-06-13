@@ -14,7 +14,7 @@ from jwcrypto.jws import JWS
 
 
 class SDJWTVerifier(SDJWTCommon):
-    _hs_disclosures: List
+    _input_disclosures: List
     _hash_to_decoded_disclosure: Dict
     _hash_to_disclosure: Dict
 
@@ -24,9 +24,12 @@ class SDJWTVerifier(SDJWTCommon):
         cb_get_issuer_key: Callable[[str], str],
         expected_aud: Union[str, None] = None,
         expected_nonce: Union[str, None] = None,
+        serialization_format: str = "compact",
     ):
-        self._parse_combined_presentation(combined_presentation)
-        self._create_hash_mappings(self._hs_disclosures)
+        super().__init__(serialization_format=serialization_format)
+
+        self._parse_sd_jwt(combined_presentation)
+        self._create_hash_mappings(self._input_disclosures)
         self._verify_sd_jwt(cb_get_issuer_key)
 
         # expected aud and nonce either need to be both set or both None
@@ -45,18 +48,6 @@ class SDJWTVerifier(SDJWTCommon):
     def get_verified_payload(self):
         return self._extract_sd_claims()
 
-    def _parse_combined_presentation(self, combined):
-        (
-            self._unverified_input_sd_jwt,
-            *self._hs_disclosures,
-            self._unverified_input_holder_binding_jwt,
-        ) = self._split(combined)
-
-    def _extract_unverified_payload_from_sd_jwt(self):
-        # Extracts only the issuer from the raw SD-JWT without verifying the signature
-        _, jwt_body, _ = self._unverified_input_sd_jwt.split(".")
-        return loads(self._base64url_decode(jwt_body))
-
     def _verify_sd_jwt(
         self,
         cb_get_issuer_key,
@@ -64,8 +55,8 @@ class SDJWTVerifier(SDJWTCommon):
     ):
         parsed_input_sd_jwt = JWS()
         parsed_input_sd_jwt.deserialize(self._unverified_input_sd_jwt)
-        unverified_payload = self._extract_unverified_payload_from_sd_jwt()
-        unverified_issuer = unverified_payload["iss"]
+
+        unverified_issuer = self._unverified_input_sd_jwt_payload["iss"]
         issuer_public_key = cb_get_issuer_key(unverified_issuer)
         parsed_input_sd_jwt.verify(issuer_public_key, alg=sign_alg)
 

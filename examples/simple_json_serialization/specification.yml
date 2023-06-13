@@ -75,3 +75,5 @@ holder_disclosed_claims:
 
 
 holder_binding: True
+
+serialization_format: json

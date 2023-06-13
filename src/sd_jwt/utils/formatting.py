@@ -25,7 +25,7 @@ def textwrap_json(data, width=EXAMPLE_MAX_WIDTH):
             output.append(line)
         else:
             # Check if line is of the form "key": "value"
-            if not line.strip().startswith('"') or ":" not in line:
+            if not line.strip().startswith('"'):
                 print("WARNING: unexpected line " + line)
                 output.append(line)
                 continue
@@ -94,6 +94,8 @@ def format_for_testcase(data, ftype):
 
 def format_for_example(data, ftype):
     if ftype == "json":
+        if isinstance(data, str):
+            data = json.loads(data)
         return textwrap_json(data)
     elif ftype == "txt":
         return textwrap_text(data)
