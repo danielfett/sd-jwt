@@ -165,4 +165,4 @@ result is `expect_verified_user_claims`.
 
 ### Other Properties
 
-When `holder_binding` is set to `true`, a Holder Binding JWT will be generated.
+When `key_binding` is set to `true`, a Key Binding JWT will be generated.
