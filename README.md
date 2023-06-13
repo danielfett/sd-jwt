@@ -83,8 +83,6 @@ respectively.
 
 The `specification.yml` file has the following format for test cases (find more examples in [tests/testcases](tests/testcases)):
 
-```yaml
-
 ### Input data: `user_claims`
 
 `user_claims` is a YAML dictionary with the user claims, i.e., the payload that
