@@ -9,10 +9,10 @@ from jwcrypto.jws import JWS
 
 class SDJWTHolder(SDJWTCommon):
     hs_disclosures: List
-    holder_binding_jwt_header: Dict
-    holder_binding_jwt_payload: Dict
-    holder_binding_jwt: JWS
-    serialized_holder_binding_jwt: str = ""
+    key_binding_jwt_header: Dict
+    key_binding_jwt_payload: Dict
+    key_binding_jwt: JWS
+    serialized_key_binding_jwt: str = ""
     combined_presentation: str
 
     _input_disclosures: List
@@ -40,28 +40,29 @@ class SDJWTHolder(SDJWTCommon):
         self.hs_disclosures = []
         self._select_disclosures(self.sd_jwt_payload, claims_to_disclose)
 
-        # Optional: Create a holder binding JWT
+        # Optional: Create a key binding JWT
         if nonce and aud and holder_key:
-            self._create_holder_binding_jwt(nonce, aud, holder_key, sign_alg)
+            self._create_key_binding_jwt(nonce, aud, holder_key, sign_alg)
 
         # Create the combined presentation
+
         if self._serialization_format == "compact":
-            # Note: If the holder binding JWT is not created, then the
+            # Note: If the key binding JWT is not created, then the
             # last element is empty, matching the spec.
             self.combined_presentation = self._combine(
                 self.serialized_sd_jwt,
                 *self.hs_disclosures,
-                self.serialized_holder_binding_jwt,
+                self.serialized_key_binding_jwt,
             )
         else:
             # In this case, take the parsed JSON serialized SD-JWT and
             # only filter the disclosures in the header. Add the holder
             # binding JWT to the header if it was created.
             self.sd_jwt_parsed[self.JWS_KEY_DISCLOSURES] = self.hs_disclosures
-            if self.serialized_holder_binding_jwt:
+            if self.serialized_key_binding_jwt:
                 self.sd_jwt_parsed[
                     self.JWS_KEY_KB_JWT
-                ] = self.serialized_holder_binding_jwt
+                ] = self.serialized_key_binding_jwt
             self.combined_presentation = dumps(self.sd_jwt_parsed)
 
     def _select_disclosures(self, sd_jwt_claims, claims_to_disclose):
@@ -192,32 +193,30 @@ class SDJWTHolder(SDJWTCommon):
             else:
                 self._select_disclosures(value, claims_to_disclose.get(key, None))
 
-    def _create_holder_binding_jwt(
+    def _create_key_binding_jwt(
         self, nonce, aud, holder_key, sign_alg: Optional[str] = None
     ):
         _alg = sign_alg or DEFAULT_SIGNING_ALG
 
-        self.holder_binding_jwt_header = {
+        self.key_binding_jwt_header = {
             "alg": _alg,
-            "typ": self.SD_JWT_R_HEADER,
+            "typ": self.KB_JWT_TYP_HEADER,
         }
 
-        self.holder_binding_jwt_payload = {
+        self.key_binding_jwt_payload = {
             "nonce": nonce,
             "aud": aud,
             "iat": int(time()),
         }
 
         # Sign the SD-JWT-Release using the holder's key
-        self.holder_binding_jwt = JWS(
-            payload=dumps(self.holder_binding_jwt_payload),
+        self.key_binding_jwt = JWS(
+            payload=dumps(self.key_binding_jwt_payload),
         )
 
-        self.holder_binding_jwt.add_signature(
+        self.key_binding_jwt.add_signature(
             holder_key,
             alg=_alg,
-            protected=dumps(self.holder_binding_jwt_header),
+            protected=dumps(self.key_binding_jwt_header),
         )
-        self.serialized_holder_binding_jwt = self.holder_binding_jwt.serialize(
-            compact=True
-        )
+        self.serialized_key_binding_jwt = self.key_binding_jwt.serialize(compact=True)

@@ -52,7 +52,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     sdjwt_at_issuer = SDJWTIssuer(
         claims,
         demo_keys["issuer_key"],
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
         serialization_format=serialization_format,
     )
@@ -65,13 +65,13 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     )
     sdjwt_at_holder.create_presentation(
         testcase["holder_disclosed_claims"],
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
+        settings["key_binding_nonce"]
+        if testcase.get("key_binding", False)
         else None,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
     )
 
     ### Verify the SD-JWT using the SD-JWT-R
@@ -89,10 +89,10 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         sdjwt_at_holder.combined_presentation,
         cb_get_issuer_key,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
+        settings["key_binding_nonce"]
+        if testcase.get("key_binding", False)
         else None,
         serialization_format=serialization_format,
     )
@@ -133,25 +133,25 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         ),
     }
 
-    if testcase.get("holder_binding", False):
+    if testcase.get("key_binding", False):
         _artifacts.update(
             {
-                "hb_jwt_header": (
-                    sdjwt_at_holder.holder_binding_jwt_header
-                    if testcase.get("holder_binding")
+                "kb_jwt_header": (
+                    sdjwt_at_holder.key_binding_jwt_header
+                    if testcase.get("key_binding")
                     else None,
                     "Header of the Holder Binding JWT",
                     "json",
                 ),
-                "hb_jwt_payload": (
-                    sdjwt_at_holder.holder_binding_jwt_payload
-                    if testcase.get("holder_binding")
+                "kb_jwt_payload": (
+                    sdjwt_at_holder.key_binding_jwt_payload
+                    if testcase.get("key_binding")
                     else None,
                     "Payload of the Holder Binding JWT",
                     "json",
                 ),
-                "hb_jwt_serialized": (
-                    sdjwt_at_holder.serialized_holder_binding_jwt,
+                "kb_jwt_serialized": (
+                    sdjwt_at_holder.serialized_key_binding_jwt,
                     "Serialized Holder Binding JWT",
                     "txt",
                 ),

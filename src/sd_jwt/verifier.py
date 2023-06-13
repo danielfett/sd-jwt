@@ -40,7 +40,7 @@ class SDJWTVerifier(SDJWTCommon):
                 )
 
             # Verify the SD-JWT-Release
-            self._verify_holder_binding_jwt(
+            self._verify_key_binding_jwt(
                 expected_aud,
                 expected_nonce,
             )
@@ -65,17 +65,15 @@ class SDJWTVerifier(SDJWTCommon):
 
         self._holder_public_key_payload = self._sd_jwt_payload.get("cnf", None)
 
-    def _verify_holder_binding_jwt(
+    def _verify_key_binding_jwt(
         self,
         expected_aud: Union[str, None] = None,
         expected_nonce: Union[str, None] = None,
         sign_alg: Union[str, None] = None,
     ):
         _alg = sign_alg or DEFAULT_SIGNING_ALG
-        parsed_input_holder_binding_jwt = JWS()
-        parsed_input_holder_binding_jwt.deserialize(
-            self._unverified_input_holder_binding_jwt
-        )
+        parsed_input_key_binding_jwt = JWS()
+        parsed_input_key_binding_jwt.deserialize(self._unverified_input_key_binding_jwt)
 
         if not self._holder_public_key_payload:
             raise ValueError("No holder public key in SD-JWT")
@@ -90,18 +88,18 @@ class SDJWTVerifier(SDJWTCommon):
 
         pubkey = JWK.from_json(dumps(holder_public_key_payload_jwk))
 
-        parsed_input_holder_binding_jwt.verify(pubkey, alg=_alg)
+        parsed_input_key_binding_jwt.verify(pubkey, alg=_alg)
 
-        holder_binding_jwt_header = parsed_input_holder_binding_jwt.jose_header
+        key_binding_jwt_header = parsed_input_key_binding_jwt.jose_header
 
-        if holder_binding_jwt_header["typ"] != self.SD_JWT_R_HEADER:
+        if key_binding_jwt_header["typ"] != self.KB_JWT_TYP_HEADER:
             raise ValueError("Invalid header typ")
 
-        holder_binding_jwt_payload = loads(parsed_input_holder_binding_jwt.payload)
+        key_binding_jwt_payload = loads(parsed_input_key_binding_jwt.payload)
 
-        if holder_binding_jwt_payload["aud"] != expected_aud:
+        if key_binding_jwt_payload["aud"] != expected_aud:
             raise ValueError("Invalid audience")
-        if holder_binding_jwt_payload["nonce"] != expected_nonce:
+        if key_binding_jwt_payload["nonce"] != expected_nonce:
             raise ValueError("Invalid nonce")
 
     def _extract_sd_claims(self):

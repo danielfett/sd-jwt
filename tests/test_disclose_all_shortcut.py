@@ -20,7 +20,7 @@ def test_e2e(testcase, settings):
     sdjwt_at_issuer = SDJWTIssuer(
         user_claims,
         demo_keys["issuer_key"],
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
         serialization_format=serialization_format,
     )
@@ -29,7 +29,7 @@ def test_e2e(testcase, settings):
 
     # This test skips the holder's part and goes straight to the verifier.
     # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
-    # We also disable holder binding checks.
+    # We also disable key binding checks.
 
     if serialization_format == "compact":
         output_holder = output_issuance + "~"
@@ -54,7 +54,7 @@ def test_e2e(testcase, settings):
     expected_claims["iss"] = settings["identifiers"]["issuer"]
     expected_claims["_sd_alg"] = "sha-256"
 
-    if testcase.get("holder_binding", False):
+    if testcase.get("key_binding", False):
         expected_claims["cnf"] = {"jwk": demo_keys["holder_key"].export_public(as_dict=True)}
 
     assert verified == expected_claims

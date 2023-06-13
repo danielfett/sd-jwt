@@ -27,4 +27,4 @@ expect_verified_user_claims:
 
 key_binding: True
 
-serialization_format: json
+serialization_format: compact

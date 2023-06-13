@@ -20,7 +20,7 @@ def test_e2e(testcase, settings):
     sdjwt_at_issuer = SDJWTIssuer(
         user_claims,
         demo_keys["issuer_key"],
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
         serialization_format=serialization_format,
     )
@@ -35,13 +35,11 @@ def test_e2e(testcase, settings):
     )
     sdjwt_at_holder.create_presentation(
         testcase["holder_disclosed_claims"],
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
-        else None,
+        settings["key_binding_nonce"] if testcase.get("key_binding", False) else None,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
-        demo_keys["holder_key"] if testcase.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
     )
 
     output_holder = sdjwt_at_holder.combined_presentation
@@ -54,11 +52,9 @@ def test_e2e(testcase, settings):
         output_holder,
         cb_get_issuer_key,
         settings["identifiers"]["verifier"]
-        if testcase.get("holder_binding", False)
+        if testcase.get("key_binding", False)
         else None,
-        settings["holder_binding_nonce"]
-        if testcase.get("holder_binding", False)
-        else None,
+        settings["key_binding_nonce"] if testcase.get("key_binding", False) else None,
         serialization_format=serialization_format,
     )
     verified = sdjwt_at_verifier.get_verified_payload()
@@ -67,7 +63,9 @@ def test_e2e(testcase, settings):
     expected_claims["iss"] = settings["identifiers"]["issuer"]
     expected_claims["_sd_alg"] = "sha-256"
 
-    if testcase.get("holder_binding", False):
-        expected_claims["cnf"] = {"jwk": demo_keys["holder_key"].export_public(as_dict=True)}
+    if testcase.get("key_binding", False):
+        expected_claims["cnf"] = {
+            "jwk": demo_keys["holder_key"].export_public(as_dict=True)
+        }
 
     assert verified == expected_claims

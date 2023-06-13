@@ -34,8 +34,7 @@ class SDJWTHasSDClaimException(Exception):
 
 class SDJWTCommon:
     SD_JWT_HEADER = None  # "sd+jwt"
-    # WiP: https://github.com/oauthstuff/draft-selective-disclosure-jwt/issues/60
-    SD_JWT_R_HEADER = "hb+jwt"
+    KB_JWT_TYP_HEADER = "kb+jwt"
     JWS_KEY_DISCLOSURES = "disclosures"
     JWS_KEY_KB_JWT = "kb_jwt"
     HASH_ALG = {"name": "sha-256", "fn": sha256}
@@ -127,7 +126,7 @@ class SDJWTCommon:
             (
                 self._unverified_input_sd_jwt,
                 *self._input_disclosures,
-                self._unverified_input_holder_binding_jwt,
+                self._unverified_input_key_binding_jwt,
             ) = self._split(sd_jwt)
 
             # Extract only the body from SD-JWT without verifying the signature
@@ -143,7 +142,7 @@ class SDJWTCommon:
             self._input_disclosures = self._unverified_input_sd_jwt_parsed[
                 self.JWS_KEY_DISCLOSURES
             ]
-            self._unverified_input_holder_binding_jwt = (
+            self._unverified_input_key_binding_jwt = (
                 self._unverified_input_sd_jwt_parsed.get(self.JWS_KEY_KB_JWT, "")
             )
             self._unverified_input_sd_jwt_payload = loads(

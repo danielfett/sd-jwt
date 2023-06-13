@@ -157,7 +157,7 @@ def run():
     sdjwt_at_issuer = SDJWTIssuer(
         claims,
         demo_keys["issuer_key"],
-        demo_keys["holder_key"] if example.get("holder_binding", False) else None,
+        demo_keys["holder_key"] if example.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
     )
 
@@ -168,9 +168,9 @@ def run():
     sdjwt_at_holder = SDJWTHolder(sdjwt_at_issuer.combined_sd_jwt_iid)
     sdjwt_at_holder.create_presentation(
         example["holder_disclosed_claims"],
-        _args.nonce if example.get("holder_binding", False) else None,
-        settings.VERIFIER if example.get("holder_binding", False) else None,
-        demo_keys["holder_key"] if example.get("holder_binding", False) else None,
+        _args.nonce if example.get("key_binding", False) else None,
+        settings.VERIFIER if example.get("key_binding", False) else None,
+        demo_keys["holder_key"] if example.get("key_binding", False) else None,
     )
 
     ### Verify the SD-JWT using the SD-JWT-R
@@ -190,8 +190,8 @@ def run():
     sdjwt_at_verifier = SDJWTVerifier(
         sdjwt_at_holder.combined_presentation,
         cb_get_issuer_key,
-        settings.VERIFIER if example.get("holder_binding", False) else None,
-        _args.nonce if example.get("holder_binding", False) else None,
+        settings.VERIFIER if example.get("key_binding", False) else None,
+        _args.nonce if example.get("key_binding", False) else None,
     )
     verified = sdjwt_at_verifier.get_verified_payload()
 
@@ -228,15 +228,15 @@ def run():
             "Combined SD-JWT and Disclosures",
             "txt",
         ),
-        "hb_jwt_payload": (
-            sdjwt_at_holder.holder_binding_jwt_payload
-            if example.get("holder_binding")
+        "kb_jwt_payload": (
+            sdjwt_at_holder.key_binding_jwt_payload
+            if example.get("key_binding")
             else None,
             "Payload of the Holder Binding JWT",
             "json",
         ),
-        "hb_jwt_serialized": (
-            sdjwt_at_holder.serialized_holder_binding_jwt,
+        "kb_jwt_serialized": (
+            sdjwt_at_holder.serialized_key_binding_jwt,
             "Serialized Holder Binding JWT",
             "txt",
         ),

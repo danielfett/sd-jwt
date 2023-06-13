@@ -2,7 +2,7 @@ user_claims:
   sub: john_doe_42
 
   # Make only first two elements SD - this array will have three elements in the resulting SD-JWT, first two hidden
-  nationalities: 
+  nationalities:
     - !sd "US"
     - !sd "CA"
     - "DE"
@@ -15,8 +15,20 @@ user_claims:
 
   # Make only last element SD
   addresses:
-    - { street: "123 Main St", city: "Anytown", state: "NY", zip: "12345", "type": "main_address" }
-    - !sd { street: "456 Main St", city: "Anytown", state: "NY", zip: "12345", "type": "secondary_address" }
+    - {
+        street: "123 Main St",
+        city: "Anytown",
+        state: "NY",
+        zip: "12345",
+        "type": "main_address",
+      }
+    - !sd {
+        street: "456 Main St",
+        city: "Anytown",
+        state: "NY",
+        zip: "12345",
+        "type": "secondary_address",
+      }
 
   # Test what happens with existing null values that are being SD'd
   null_values:
@@ -31,8 +43,8 @@ user_claims:
     - !sd 3.14
     - !sd "foo"
     - !sd True
-    - !sd ["Test"]  
-    - !sd {"foo": "bar"}
+    - !sd ["Test"]
+    - !sd { "foo": "bar" }
 
   # What happens with SD arrays in SD arrays?
   nested_array: [[!sd "foo", !sd "bar"], [!sd "baz", !sd "qux"]]
@@ -51,10 +63,10 @@ user_claims:
 
 holder_disclosed_claims:
   sub: null
-  nationalities: 
+  nationalities:
     - False
     - True
-  
+
   is_over:
     "13": False
     "18": True
@@ -73,5 +85,4 @@ holder_disclosed_claims:
 
   nested_array: [[True, False], [False, True]]
 
-
-holder_binding: True
+key_binding: True
