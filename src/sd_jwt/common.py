@@ -11,12 +11,13 @@ SD_DIGESTS_KEY = "_sd"
 DIGEST_ALG_KEY = "_sd_alg"
 SD_LIST_PREFIX = "..."
 
+
 @dataclass
 class SDObj:
     """This class can be used to make this part of the object selective disclosable."""
 
     value: any
-    
+
     # Make hashable
     def __hash__(self):
         return hash(self.value)
@@ -34,22 +35,28 @@ class SDJWTHasSDClaimException(Exception):
 class SDJWTCommon:
     SD_JWT_HEADER = None  # "sd+jwt"
     KB_JWT_TYP_HEADER = "kb+jwt"
-    # TODO: adopt a dynamic module/package loader, defs could be as string -> "fn": "hashlib.sha256"
+    JWS_KEY_DISCLOSURES = "disclosures"
+    JWS_KEY_KB_JWT = "kb_jwt"
     HASH_ALG = {"name": "sha-256", "fn": sha256}
 
-    COMBINED_FORMAT_SEPARATOR = "~"
+    COMBINED_serialization_FORMAT_SEPARATOR = "~"
 
     unsafe_randomness = False
+
+    def __init__(self, serialization_format):
+        if serialization_format not in ("compact", "json"):
+            raise ValueError(f"Unknown serialization format: {serialization_format}")
+        self._serialization_format = serialization_format
 
     def _b64hash(self, raw):
         # Calculate the SHA 256 hash and output it base64 encoded
         return self._base64url_encode(self.HASH_ALG["fn"](raw).digest())
 
     def _combine(self, *parts):
-        return self.COMBINED_FORMAT_SEPARATOR.join(parts)
+        return self.COMBINED_serialization_FORMAT_SEPARATOR.join(parts)
 
     def _split(self, combined):
-        return combined.split(self.COMBINED_FORMAT_SEPARATOR)
+        return combined.split(self.COMBINED_serialization_FORMAT_SEPARATOR)
 
     @staticmethod
     def _base64url_encode(data: bytes) -> str:
@@ -108,3 +115,36 @@ class SDJWTCommon:
         else:
             return
 
+    def _parse_sd_jwt(self, sd_jwt, is_holder=False):
+        # TODO: The 'is_holder' parameter is a temporary workaround for the
+        #       fact that the SD-JWT spec right now knows two different formats.
+        #       To be removed!
+        if self._serialization_format == "compact" and is_holder:
+            sd_jwt += "~"
+
+        if self._serialization_format == "compact":
+            (
+                self._unverified_input_sd_jwt,
+                *self._input_disclosures,
+                self._unverified_input_key_binding_jwt,
+            ) = self._split(sd_jwt)
+
+            # Extract only the body from SD-JWT without verifying the signature
+            _, jwt_body, _ = self._unverified_input_sd_jwt.split(".")
+            self._unverified_input_sd_jwt_payload = loads(
+                self._base64url_decode(jwt_body)
+            )
+
+        else:
+            # if the SD-JWT is in JSON format, parse the json and extract the disclosures.
+            self._unverified_input_sd_jwt = sd_jwt
+            self._unverified_input_sd_jwt_parsed = loads(sd_jwt)
+            self._input_disclosures = self._unverified_input_sd_jwt_parsed[
+                self.JWS_KEY_DISCLOSURES
+            ]
+            self._unverified_input_key_binding_jwt = (
+                self._unverified_input_sd_jwt_parsed.get(self.JWS_KEY_KB_JWT, "")
+            )
+            self._unverified_input_sd_jwt_payload = loads(
+                self._base64url_decode(self._unverified_input_sd_jwt_parsed["payload"])
+            )

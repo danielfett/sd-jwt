@@ -15,25 +15,23 @@ class SDJWTHolder(SDJWTCommon):
     serialized_key_binding_jwt: str = ""
     combined_presentation: str
 
-    _ii_disclosures: List
+    _input_disclosures: List
     _hash_to_decoded_disclosure: Dict
     _hash_to_disclosure: Dict
 
-    def __init__(self, combined_sd_jwt_iid: str):
-        self._parse_combined_sd_jwt_iid(combined_sd_jwt_iid)
-        self._create_hash_mappings(self._ii_disclosures)
-        self._extract_payload_unverified()
+    def __init__(self, combined_sd_jwt_iid: str, serialization_format: str = "compact"):
+        super().__init__(serialization_format=serialization_format)
 
-    def _parse_combined_sd_jwt_iid(self, combined):
-        self.serialized_sd_jwt, *self._ii_disclosures = self._split(combined)
+        self._parse_sd_jwt(combined_sd_jwt_iid, is_holder=True)
 
-    def _extract_payload_unverified(self):
         # TODO: This holder does not verify the SD-JWT yet - this
         # is not strictly needed, but it would be nice to have.
+        self.serialized_sd_jwt = self._unverified_input_sd_jwt
+        self.sd_jwt_payload = self._unverified_input_sd_jwt_payload
+        if self._serialization_format == "json":
+            self.sd_jwt_parsed = self._unverified_input_sd_jwt_parsed
 
-        # Extract only the body from SD-JWT without verifying the signature
-        _, jwt_body, _ = self.serialized_sd_jwt.split(".")
-        self.sd_jwt_payload = loads(self._base64url_decode(jwt_body))
+        self._create_hash_mappings(self._input_disclosures)
 
     def create_presentation(
         self, claims_to_disclose, nonce=None, aud=None, holder_key=None, sign_alg=None
@@ -47,13 +45,25 @@ class SDJWTHolder(SDJWTCommon):
             self._create_key_binding_jwt(nonce, aud, holder_key, sign_alg)
 
         # Create the combined presentation
-        # Note: If the key binding JWT is not created, then the
-        # last element is empty, matching the spec.
-        self.combined_presentation = self._combine(
-            self.serialized_sd_jwt,
-            *self.hs_disclosures,
-            self.serialized_key_binding_jwt,
-        )
+
+        if self._serialization_format == "compact":
+            # Note: If the key binding JWT is not created, then the
+            # last element is empty, matching the spec.
+            self.combined_presentation = self._combine(
+                self.serialized_sd_jwt,
+                *self.hs_disclosures,
+                self.serialized_key_binding_jwt,
+            )
+        else:
+            # In this case, take the parsed JSON serialized SD-JWT and
+            # only filter the disclosures in the header. Add the holder
+            # binding JWT to the header if it was created.
+            self.sd_jwt_parsed[self.JWS_KEY_DISCLOSURES] = self.hs_disclosures
+            if self.serialized_key_binding_jwt:
+                self.sd_jwt_parsed[
+                    self.JWS_KEY_KB_JWT
+                ] = self.serialized_key_binding_jwt
+            self.combined_presentation = dumps(self.sd_jwt_parsed)
 
     def _select_disclosures(self, sd_jwt_claims, claims_to_disclose):
         # Recursively process the claims in sd_jwt_claims. In each
@@ -209,6 +219,4 @@ class SDJWTHolder(SDJWTCommon):
             alg=_alg,
             protected=dumps(self.key_binding_jwt_header),
         )
-        self.serialized_key_binding_jwt = self.key_binding_jwt.serialize(
-            compact=True
-        )
+        self.serialized_key_binding_jwt = self.key_binding_jwt.serialize(compact=True)

@@ -37,6 +37,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     ### Load test case data
     testcase = load_yaml_specification(testcase_path)
     use_decoys = testcase.get("add_decoy_claims", False)
+    serialization_format = testcase.get("serialization_format", "compact")
 
     claims = {
         "iss": settings["identifiers"]["issuer"],
@@ -53,11 +54,15 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         demo_keys["issuer_key"],
         demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
+        serialization_format=serialization_format,
     )
 
     ### Produce SD-JWT-R for selected example
 
-    sdjwt_at_holder = SDJWTHolder(sdjwt_at_issuer.combined_sd_jwt_iid)
+    sdjwt_at_holder = SDJWTHolder(
+        sdjwt_at_issuer.combined_sd_jwt_iid,
+        serialization_format=serialization_format,
+    )
     sdjwt_at_holder.create_presentation(
         testcase["holder_disclosed_claims"],
         settings["key_binding_nonce"]
@@ -89,6 +94,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         settings["key_binding_nonce"]
         if testcase.get("key_binding", False)
         else None,
+        serialization_format=serialization_format,
     )
     verified = sdjwt_at_verifier.get_verified_payload()
 
@@ -108,17 +114,17 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
         "sd_jwt_serialized": (
             sdjwt_at_issuer.serialized_sd_jwt,
             "Serialized SD-JWT",
-            "txt",
+            "txt" if serialization_format == "compact" else "json",
         ),
         "combined_issuance": (
             sdjwt_at_issuer.combined_sd_jwt_iid,
             "Combined SD-JWT and Disclosures",
-            "txt",
+            "txt" if serialization_format == "compact" else "json",
         ),
         "combined_presentation": (
             sdjwt_at_holder.combined_presentation,
             "Combined representation of SD-JWT and HS-Disclosures",
-            "txt",
+            "txt" if serialization_format == "compact" else "json",
         ),
         "verified_contents": (
             verified,

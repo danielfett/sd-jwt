@@ -9,6 +9,7 @@ def test_e2e(testcase, settings):
     seed = settings["random_seed"]
     demo_keys = get_jwk(settings["key_settings"], True, seed)
     use_decoys = testcase.get("add_decoy_claims", False)
+    serialization_format = testcase.get("serialization_format", "compact")
 
     # Issuer: Produce SD-JWT and issuance format for selected example
 
@@ -21,6 +22,7 @@ def test_e2e(testcase, settings):
         demo_keys["issuer_key"],
         demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
         add_decoy_claims=use_decoys,
+        serialization_format=serialization_format,
     )
 
     output_issuance = sdjwt_at_issuer.combined_sd_jwt_iid
@@ -29,7 +31,10 @@ def test_e2e(testcase, settings):
     # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
     # We also disable key binding checks.
 
-    output_holder = output_issuance + "~"
+    if serialization_format == "compact":
+        output_holder = output_issuance + "~"
+    else:
+        output_holder = output_issuance
 
     # Verifier
     def cb_get_issuer_key(issuer):
@@ -40,6 +45,7 @@ def test_e2e(testcase, settings):
         cb_get_issuer_key,
         None,
         None,
+        serialization_format=serialization_format,
     )
     verified = sdjwt_at_verifier.get_verified_payload()
 
@@ -47,5 +53,8 @@ def test_e2e(testcase, settings):
     expected_claims = remove_sdobj_wrappers(testcase["user_claims"])
     expected_claims["iss"] = settings["identifiers"]["issuer"]
     expected_claims["_sd_alg"] = "sha-256"
+
+    if testcase.get("key_binding", False):
+        expected_claims["cnf"] = {"jwk": demo_keys["holder_key"].export_public(as_dict=True)}
 
     assert verified == expected_claims
