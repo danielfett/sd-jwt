@@ -74,6 +74,6 @@ holder_disclosed_claims:
   nested_array: [[True, False], [False, True]]
 
 
-holder_binding: True
+key_binding: True
 
 serialization_format: json

@@ -35,19 +35,13 @@ Furthermore, the script expects, in its working directory, one subdirectory for 
 
 The script outputs the following files in each test case or example directory:
  * `combined_issuance.txt`: The issuance format of the SD-JWT. (*)
- * `combined_presentation.txt`: The presentation format of the SD-JWT.is used. (*)
+ * `combined_presentation.txt`: The presentation format of the SD-JWT. (*)
  * `disclosures.md`: The disclosures, formatted as markdown (only in 'example' mode).
  * `user_claims.json`: The user claims.
  * `sd_jwt_payload.json`: The payload of the SD-JWT.
-<<<<<<< HEAD
  * `sd_jwt_serialized.txt`: The serialized SD-JWT. (*)
- * `hb_jwt_payload.json`: The payload of the holder binding JWT.
- * `hb_jwt_serialized.txt`: The serialized holder binding JWT.
-=======
- * `sd_jwt_serialized.txt`: The serialized SD-JWT.
  * `kb_jwt_payload.json`: The payload of the key binding JWT.
  * `kb_jwt_serialized.txt`: The serialized key binding JWT.
->>>>>>> main
  * `verified_contents.json`: The verified contents of the SD-JWT.
 
 (*) Note: When JWS JSON Serialization is used, the file extensions of these files are `.json` instead of `.txt`.
