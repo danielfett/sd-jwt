@@ -57,10 +57,10 @@ class SDJWTHolder(SDJWTCommon):
             # In this case, take the parsed JSON serialized SD-JWT and
             # only filter the disclosures in the header. Add the holder
             # binding JWT to the header if it was created.
-            self.sd_jwt_parsed["header"]["disclosures"] = self.hs_disclosures
+            self.sd_jwt_parsed[self.JWS_KEY_DISCLOSURES] = self.hs_disclosures
             if self.serialized_holder_binding_jwt:
-                self.sd_jwt_parsed["header"][
-                    "kb_jwt"
+                self.sd_jwt_parsed[
+                    self.JWS_KEY_KB_JWT
                 ] = self.serialized_holder_binding_jwt
             self.combined_presentation = dumps(self.sd_jwt_parsed)
 

@@ -1,5 +1,5 @@
 import random
-from json import dumps
+from json import loads, dumps
 from typing import Dict, List
 
 from jwcrypto.jws import JWS
@@ -171,21 +171,26 @@ class SDJWTIssuer(SDJWTCommon):
         if self.SD_JWT_HEADER:
             _protected_headers["typ"] = self.SD_JWT_HEADER
 
-        # If serialization_format is "json", then add the disclosures in the unprotected headers
-        if self._serialization_format == "json":
-            _unprotected_headers = {"disclosures": [d.b64 for d in self.ii_disclosures]}
-        else:
-            _unprotected_headers = None
-
         self.sd_jwt.add_signature(
             self._issuer_key,
             alg=self._sign_alg,
             protected=dumps(_protected_headers),
-            header=_unprotected_headers,
         )
+
         self.serialized_sd_jwt = self.sd_jwt.serialize(
             compact=(self._serialization_format == "compact")
         )
+
+        # If serialization_format is "json", then add the disclosures to the JSON.
+        # There does not seem to be a straightforward way to do that with the library
+        # other than JSON-decoding the JWS and JSON-encoding it again.
+        if self._serialization_format == "json":
+            self.serialized_sd_jwt = dumps(
+                loads(self.serialized_sd_jwt)
+                | {self.JWS_KEY_DISCLOSURES: [d.b64 for d in self.ii_disclosures]}
+            )
+
+            print(self.serialized_sd_jwt)
 
     def _create_combined(self):
         if self._serialization_format == "compact":
