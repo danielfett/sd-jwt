@@ -194,5 +194,6 @@ class SDJWTIssuer(SDJWTCommon):
             self.combined_sd_jwt_iid = self._combine(
                 self.serialized_sd_jwt, *(d.b64 for d in self.ii_disclosures)
             )
+            self.combined_sd_jwt_iid += self.COMBINED_serialization_FORMAT_SEPARATOR
         else:
             self.combined_sd_jwt_iid = self.serialized_sd_jwt

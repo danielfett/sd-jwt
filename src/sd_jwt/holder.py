@@ -22,7 +22,7 @@ class SDJWTHolder(SDJWTCommon):
     def __init__(self, combined_sd_jwt_iid: str, serialization_format: str = "compact"):
         super().__init__(serialization_format=serialization_format)
 
-        self._parse_sd_jwt(combined_sd_jwt_iid, is_holder=True)
+        self._parse_sd_jwt(combined_sd_jwt_iid)
 
         # TODO: This holder does not verify the SD-JWT yet - this
         # is not strictly needed, but it would be nice to have.
