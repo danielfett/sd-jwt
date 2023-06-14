@@ -28,13 +28,8 @@ def test_e2e(testcase, settings):
     output_issuance = sdjwt_at_issuer.sd_jwt_issuance
 
     # This test skips the holder's part and goes straight to the verifier.
-    # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
-    # We also disable key binding checks.
-
-    if serialization_format == "compact":
-        output_holder = output_issuance + "~"
-    else:
-        output_holder = output_issuance
+    # We disable key binding checks.
+    output_holder = output_issuance
 
     # Verifier
     def cb_get_issuer_key(issuer):
