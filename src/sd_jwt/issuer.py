@@ -24,7 +24,7 @@ class SDJWTIssuer(SDJWTCommon):
     serialized_sd_jwt: str
 
     ii_disclosures: List
-    combined_sd_jwt_iid: str
+    sd_jwt_issuance: str
 
     decoy_digests: List
 
@@ -191,9 +191,9 @@ class SDJWTIssuer(SDJWTCommon):
 
     def _create_combined(self):
         if self._serialization_format == "compact":
-            self.combined_sd_jwt_iid = self._combine(
+            self.sd_jwt_issuance = self._combine(
                 self.serialized_sd_jwt, *(d.b64 for d in self.ii_disclosures)
             )
-            self.combined_sd_jwt_iid += self.COMBINED_serialization_FORMAT_SEPARATOR
+            self.sd_jwt_issuance += self.COMBINED_serialization_FORMAT_SEPARATOR
         else:
-            self.combined_sd_jwt_iid = self.serialized_sd_jwt
+            self.sd_jwt_issuance = self.serialized_sd_jwt

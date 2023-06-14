@@ -34,12 +34,12 @@ For both use cases, the script expects a JSON file with settings (`settings.yml`
 Furthermore, the script expects, in its working directory, one subdirectory for each test case or example. In each such directory, there must be a file `specification.yml` with the test case or example specifications. Examples for these files can be found in the subdirectories of the [tests/testcases](tests/testcases) and [examples](examples) directories, respectively.
 
 The script outputs the following files in each test case or example directory:
- * `combined_issuance.txt`: The issuance format of the SD-JWT. (*)
- * `combined_presentation.txt`: The presentation format of the SD-JWT. (*)
+ * `sd_jwt_issuance.txt`: The issued SD-JWT. (*)
+ * `sd_jwt_presentation.txt`: The presented SD-JWT. (*)
  * `disclosures.md`: The disclosures, formatted as markdown (only in 'example' mode).
  * `user_claims.json`: The user claims.
  * `sd_jwt_payload.json`: The payload of the SD-JWT.
- * `sd_jwt_serialized.txt`: The serialized SD-JWT. (*)
+ * `sd_jwt_jws_part.txt`: The serialized JWS component of the SD-JWT. (*)
  * `kb_jwt_payload.json`: The payload of the key binding JWT.
  * `kb_jwt_serialized.txt`: The serialized key binding JWT.
  * `verified_contents.json`: The verified contents of the SD-JWT.

@@ -25,7 +25,7 @@ def test_e2e(testcase, settings):
         serialization_format=serialization_format,
     )
 
-    output_issuance = sdjwt_at_issuer.combined_sd_jwt_iid
+    output_issuance = sdjwt_at_issuer.sd_jwt_issuance
 
     # This test skips the holder's part and goes straight to the verifier.
     # To do so, we simply add a "~" to the issuance format, turning it into a presentation format.
