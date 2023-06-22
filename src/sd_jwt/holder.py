@@ -13,16 +13,16 @@ class SDJWTHolder(SDJWTCommon):
     key_binding_jwt_payload: Dict
     key_binding_jwt: JWS
     serialized_key_binding_jwt: str = ""
-    combined_presentation: str
+    sd_jwt_presentation: str
 
     _input_disclosures: List
     _hash_to_decoded_disclosure: Dict
     _hash_to_disclosure: Dict
 
-    def __init__(self, combined_sd_jwt_iid: str, serialization_format: str = "compact"):
+    def __init__(self, sd_jwt_issuance: str, serialization_format: str = "compact"):
         super().__init__(serialization_format=serialization_format)
 
-        self._parse_sd_jwt(combined_sd_jwt_iid, is_holder=True)
+        self._parse_sd_jwt(sd_jwt_issuance)
 
         # TODO: This holder does not verify the SD-JWT yet - this
         # is not strictly needed, but it would be nice to have.
@@ -49,7 +49,7 @@ class SDJWTHolder(SDJWTCommon):
         if self._serialization_format == "compact":
             # Note: If the key binding JWT is not created, then the
             # last element is empty, matching the spec.
-            self.combined_presentation = self._combine(
+            self.sd_jwt_presentation = self._combine(
                 self.serialized_sd_jwt,
                 *self.hs_disclosures,
                 self.serialized_key_binding_jwt,
@@ -63,7 +63,7 @@ class SDJWTHolder(SDJWTCommon):
                 self.sd_jwt_parsed[
                     self.JWS_KEY_KB_JWT
                 ] = self.serialized_key_binding_jwt
-            self.combined_presentation = dumps(self.sd_jwt_parsed)
+            self.sd_jwt_presentation = dumps(self.sd_jwt_parsed)
 
     def _select_disclosures(self, sd_jwt_claims, claims_to_disclose):
         # Recursively process the claims in sd_jwt_claims. In each

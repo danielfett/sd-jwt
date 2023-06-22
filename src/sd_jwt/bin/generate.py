@@ -60,7 +60,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     ### Produce SD-JWT-R for selected example
 
     sdjwt_at_holder = SDJWTHolder(
-        sdjwt_at_issuer.combined_sd_jwt_iid,
+        sdjwt_at_issuer.sd_jwt_issuance,
         serialization_format=serialization_format,
     )
     sdjwt_at_holder.create_presentation(
@@ -86,7 +86,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
             raise Exception(f"Unknown issuer: {issuer}")
 
     sdjwt_at_verifier = SDJWTVerifier(
-        sdjwt_at_holder.combined_presentation,
+        sdjwt_at_holder.sd_jwt_presentation,
         cb_get_issuer_key,
         settings["identifiers"]["verifier"]
         if testcase.get("key_binding", False)
@@ -111,18 +111,18 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
             "Payload of the SD-JWT",
             "json",
         ),
-        "sd_jwt_serialized": (
+        "sd_jwt_jws_part": (
             sdjwt_at_issuer.serialized_sd_jwt,
             "Serialized SD-JWT",
             "txt" if serialization_format == "compact" else "json",
         ),
-        "combined_issuance": (
-            sdjwt_at_issuer.combined_sd_jwt_iid,
+        "sd_jwt_issuance": (
+            sdjwt_at_issuer.sd_jwt_issuance,
             "Combined SD-JWT and Disclosures",
             "txt" if serialization_format == "compact" else "json",
         ),
-        "combined_presentation": (
-            sdjwt_at_holder.combined_presentation,
+        "sd_jwt_presentation": (
+            sdjwt_at_holder.sd_jwt_presentation,
             "Combined representation of SD-JWT and HS-Disclosures",
             "txt" if serialization_format == "compact" else "json",
         ),

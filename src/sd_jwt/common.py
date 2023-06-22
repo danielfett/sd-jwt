@@ -115,12 +115,7 @@ class SDJWTCommon:
         else:
             return
 
-    def _parse_sd_jwt(self, sd_jwt, is_holder=False):
-        # TODO: The 'is_holder' parameter is a temporary workaround for the
-        #       fact that the SD-JWT spec right now knows two different formats.
-        #       To be removed!
-        if self._serialization_format == "compact" and is_holder:
-            sd_jwt += "~"
+    def _parse_sd_jwt(self, sd_jwt):
 
         if self._serialization_format == "compact":
             (

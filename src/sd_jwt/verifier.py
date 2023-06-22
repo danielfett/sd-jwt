@@ -20,7 +20,7 @@ class SDJWTVerifier(SDJWTCommon):
 
     def __init__(
         self,
-        combined_presentation: str,
+        sd_jwt_presentation: str,
         cb_get_issuer_key: Callable[[str], str],
         expected_aud: Union[str, None] = None,
         expected_nonce: Union[str, None] = None,
@@ -28,7 +28,7 @@ class SDJWTVerifier(SDJWTCommon):
     ):
         super().__init__(serialization_format=serialization_format)
 
-        self._parse_sd_jwt(combined_presentation)
+        self._parse_sd_jwt(sd_jwt_presentation)
         self._create_hash_mappings(self._input_disclosures)
         self._verify_sd_jwt(cb_get_issuer_key)
 

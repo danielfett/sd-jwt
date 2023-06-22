@@ -25,7 +25,7 @@ def test_e2e(testcase, settings):
         serialization_format=serialization_format,
     )
 
-    output_issuance = sdjwt_at_issuer.combined_sd_jwt_iid
+    output_issuance = sdjwt_at_issuer.sd_jwt_issuance
 
     # Holder
 
@@ -42,7 +42,7 @@ def test_e2e(testcase, settings):
         demo_keys["holder_key"] if testcase.get("key_binding", False) else None,
     )
 
-    output_holder = sdjwt_at_holder.combined_presentation
+    output_holder = sdjwt_at_holder.sd_jwt_presentation
 
     # Verifier
     def cb_get_issuer_key(issuer):

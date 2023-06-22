@@ -165,7 +165,7 @@ def run():
 
     # Note: The only input from the issuer is the combined SD-JWT and SVC!
 
-    sdjwt_at_holder = SDJWTHolder(sdjwt_at_issuer.combined_sd_jwt_iid)
+    sdjwt_at_holder = SDJWTHolder(sdjwt_at_issuer.sd_jwt_issuance)
     sdjwt_at_holder.create_presentation(
         example["holder_disclosed_claims"],
         _args.nonce if example.get("key_binding", False) else None,
@@ -188,7 +188,7 @@ def run():
 
     # Note: The only input from the holder is the combined presentation!
     sdjwt_at_verifier = SDJWTVerifier(
-        sdjwt_at_holder.combined_presentation,
+        sdjwt_at_holder.sd_jwt_presentation,
         cb_get_issuer_key,
         settings.VERIFIER if example.get("key_binding", False) else None,
         _args.nonce if example.get("key_binding", False) else None,
@@ -217,14 +217,14 @@ def run():
     _artifacts = {
         "user_claims": (example["user_claims"], "User Claims", "json"),
         "sd_jwt_payload": (sdjwt_at_issuer.sd_jwt_payload, "Payload of the SD-JWT", "json"),
-        "sd_jwt_serialized": (
+        "sd_jwt_jws_part": (
             sdjwt_at_issuer.serialized_sd_jwt,
             "Serialized SD-JWT",
             "txt",
         ),
         "disclosures": (iid_payload, "Payloads of the II-Disclosures", "md"),
-        "combined_issuance": (
-            sdjwt_at_issuer.combined_sd_jwt_iid,
+        "sd_jwt_issuance": (
+            sdjwt_at_issuer.sd_jwt_issuance,
             "Combined SD-JWT and Disclosures",
             "txt",
         ),
@@ -240,8 +240,8 @@ def run():
             "Serialized Holder Binding JWT",
             "txt",
         ),
-        "combined_presentation": (
-            sdjwt_at_holder.combined_presentation,
+        "sd_jwt_presentation": (
+            sdjwt_at_holder.sd_jwt_presentation,
             "Combined representation of SD-JWT and HS-Disclosures",
             "txt",
         ),
