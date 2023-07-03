@@ -56,7 +56,7 @@ class SDJWTVerifier(SDJWTCommon):
         parsed_input_sd_jwt = JWS()
         parsed_input_sd_jwt.deserialize(self._unverified_input_sd_jwt)
 
-        unverified_issuer = self._unverified_input_sd_jwt_payload["iss"]
+        unverified_issuer = self._unverified_input_sd_jwt_payload.get("iss", None)
         issuer_public_key = cb_get_issuer_key(unverified_issuer)
         parsed_input_sd_jwt.verify(issuer_public_key, alg=sign_alg)
 

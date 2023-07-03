@@ -46,6 +46,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     }
 
     claims.update(testcase["user_claims"])
+    claims = {key: value for key, value in claims.items() if value is not None}
 
     ### Produce SD-JWT and SVC for selected example
     SDJWTIssuer.unsafe_randomness = True
@@ -80,7 +81,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     # matching public key
     def cb_get_issuer_key(issuer):
         # Do not use in production - this allows to use any issuer name for demo purposes
-        if issuer == claims["iss"]:
+        if issuer == claims.get("iss", None):
             return demo_keys["issuer_public_key"]
         else:
             raise Exception(f"Unknown issuer: {issuer}")
