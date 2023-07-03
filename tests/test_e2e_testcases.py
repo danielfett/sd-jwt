@@ -61,7 +61,6 @@ def test_e2e(testcase, settings):
 
     expected_claims = testcase["expect_verified_user_claims"]
     expected_claims["iss"] = settings["identifiers"]["issuer"]
-    expected_claims["_sd_alg"] = "sha-256"
 
     if testcase.get("key_binding", False):
         expected_claims["cnf"] = {

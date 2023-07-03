@@ -138,7 +138,7 @@ class SDJWTVerifier(SDJWTCommon):
             pre_output = {
                 k: self._unpack_disclosed_claims(v)
                 for k, v in sd_jwt_claims.items()
-                if k != SD_DIGESTS_KEY
+                if k != SD_DIGESTS_KEY and k != DIGEST_ALG_KEY
             }
 
             for digest in sd_jwt_claims.get(SD_DIGESTS_KEY, []):
