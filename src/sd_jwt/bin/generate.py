@@ -100,10 +100,12 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     verified = sdjwt_at_verifier.get_verified_payload()
 
     # Write the test case data to the directory of the test case
+    user_claims = remove_sdobj_wrappers(testcase["user_claims"])
+    user_claims = {key: value for key, value in user_claims.items() if value is not None}
 
     _artifacts = {
         "user_claims": (
-            remove_sdobj_wrappers(testcase["user_claims"]),
+            user_claims,
             "User Claims",
             "json",
         ),
