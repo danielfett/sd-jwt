@@ -47,7 +47,6 @@ def test_e2e(testcase, settings):
     # We here expect that the output claims are the same as the input claims
     expected_claims = remove_sdobj_wrappers(testcase["user_claims"])
     expected_claims["iss"] = settings["identifiers"]["issuer"]
-    expected_claims["_sd_alg"] = "sha-256"
 
     if testcase.get("key_binding", False):
         expected_claims["cnf"] = {"jwk": demo_keys["holder_key"].export_public(as_dict=True)}
