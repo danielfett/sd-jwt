@@ -38,15 +38,17 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     testcase = load_yaml_specification(testcase_path)
     use_decoys = testcase.get("add_decoy_claims", False)
     serialization_format = testcase.get("serialization_format", "compact")
+    include_default_claims = testcase.get("include_default_claims", True)
 
-    claims = {
-        "iss": settings["identifiers"]["issuer"],
-        "iat": settings["iat"],
-        "exp": settings["exp"],
-    }
+    claims = {}
+    if include_default_claims:
+        claims = {
+            "iss": settings["identifiers"]["issuer"],
+            "iat": settings["iat"],
+            "exp": settings["exp"],
+        }
 
     claims.update(testcase["user_claims"])
-    claims = {key: value for key, value in claims.items() if value is not None}
 
     ### Produce SD-JWT and SVC for selected example
     SDJWTIssuer.unsafe_randomness = True
@@ -100,12 +102,10 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     verified = sdjwt_at_verifier.get_verified_payload()
 
     # Write the test case data to the directory of the test case
-    user_claims = remove_sdobj_wrappers(testcase["user_claims"])
-    user_claims = {key: value for key, value in user_claims.items() if value is not None}
 
     _artifacts = {
         "user_claims": (
-            user_claims,
+            remove_sdobj_wrappers(testcase["user_claims"]),
             "User Claims",
             "json",
         ),
