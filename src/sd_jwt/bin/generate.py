@@ -38,12 +38,15 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     testcase = load_yaml_specification(testcase_path)
     use_decoys = testcase.get("add_decoy_claims", False)
     serialization_format = testcase.get("serialization_format", "compact")
+    include_default_claims = testcase.get("include_default_claims", True)
 
-    claims = {
-        "iss": settings["identifiers"]["issuer"],
-        "iat": settings["iat"],
-        "exp": settings["exp"],
-    }
+    claims = {}
+    if include_default_claims:
+        claims = {
+            "iss": settings["identifiers"]["issuer"],
+            "iat": settings["iat"],
+            "exp": settings["exp"],
+        }
 
     claims.update(testcase["user_claims"])
 
@@ -80,7 +83,7 @@ def generate_test_case_data(settings: Dict, testcase_path: Path, type: str):
     # matching public key
     def cb_get_issuer_key(issuer):
         # Do not use in production - this allows to use any issuer name for demo purposes
-        if issuer == claims["iss"]:
+        if issuer == claims.get("iss", None):
             return demo_keys["issuer_public_key"]
         else:
             raise Exception(f"Unknown issuer: {issuer}")
